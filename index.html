@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catatan Online</title>
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6b8cae;
+            --accent-color: #ff7e5f;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+        
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            background: var(--primary-color);
+            color: #fff;
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        
+        .btn:hover {
+            background: var(--secondary-color);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-accent {
+            background: var(--accent-color);
+        }
+        
+        .btn-accent:hover {
+            background: #ff6b4a;
+        }
+        
+        .btn-danger {
+            background: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        /* Form Styles */
+        .form-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
+        }
+        
+        /* Alert Styles */
+        .alert {
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        
+        /* Dashboard Styles */
+        .notes-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .note-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .note-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+        
+        .note-content {
+            color: #555;
+            margin-bottom: 1rem;
+        }
+        
+        .note-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #777;
+        }
+        
+        .note-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        /* Profile Styles */
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 2rem;
+        }
+        
+        .avatar-selection {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1.5rem 0;
+        }
+        
+        .avatar-option {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 3px solid transparent;
+        }
+        
+        .avatar-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .avatar-option.selected {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 10px rgba(255, 126, 95, 0.5);
+        }
+        
+        .current-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 4px solid var(--primary-color);
+        }
+        
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mt-3 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 2rem; }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+            }
+            
+            .nav-links {
+                margin-top: 1rem;
+            }
+            
+            .nav-links li {
+                margin-left: 1rem;
+                margin-right: 1rem;
+            }
+            
+            .notes-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container header-container">
+            <div class="logo">Catatan Online</div>
+            <ul class="nav-links">
+                <li><a href="#" id="nav-home">Home</a></li>
+                <li><a href="#" id="nav-login" class="hidden">Login</a></li>
+                <li><a href="#" id="nav-register" class="hidden">Register</a></li>
+                <li><a href="#" id="nav-dashboard" class="hidden">Dashboard</a></li>
+                <li><a href="#" id="nav-profile" class="hidden">Profile</a></li>
+                <li><a href="#" id="nav-logout" class="hidden">Logout</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <main class="container">
+        <!-- Home Page -->
+        <section id="home-page">
+            <div class="text-center mt-4">
+                <h1>Selamat Datang di Catatan Online</h1>
+                <p class="mt-2">Aplikasi sederhana untuk menyimpan catatan Anda secara online</p>
+                <div class="mt-3">
+                    <a href="#" id="home-login-btn" class="btn btn-accent">Login</a>
+                    <a href="#" id="home-register-btn" class="btn btn-outline">Register</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Login Page -->
+        <section id="login-page" class="hidden">
+            <div class="form-container">
+                <h2 class="text-center">Login</h2>
+                <div id="login-alert" class="alert alert-danger hidden"></div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-accent">Login</button>
+                </form>
+                <p class="mt-2 text-center">Belum punya akun? <a href="#" id="login-to-register">Register disini</a></p>
+            </div>
+        </section>
+
+        <!-- Register Page -->
+        <section id="register-page" class="hidden">
+            <div class="form-container">
+                <h2 class="text-center">Register</h2>
+                <div id="register-alert" class="alert alert-danger hidden"></div>
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-name">Nama Lengkap</label>
+                        <input type="text" id="register-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">Konfirmasi Password</label>
+                        <input type="password" id="register-confirm-password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-accent">Register</button>
+                </form>
+                <p class="mt-2 text-center">Sudah punya akun? <a href="#" id="register-to-login">Login disini</a></p>
+            </div>
+        </section>
+
+        <!-- Dashboard Page -->
+        <section id="dashboard-page" class="hidden">
+            <h2>Catatan Saya</h2>
+            <div class="mt-2">
+                <button id="add-note-btn" class="btn btn-accent">Tambah Catatan</button>
+            </div>
+            
+            <div class="notes-container mt-3" id="notes-list">
+                <!-- Notes will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Add/Edit Note Modal -->
+        <div id="note-modal" class="hidden">
+            <div class="form-container" style="max-width: 600px;">
+                <h2 id="note-modal-title">Tambah Catatan Baru</h2>
+                <form id="note-form">
+                    <input type="hidden" id="note-id">
+                    <div class="form-group">
+                        <label for="note-title">Judul</label>
+                        <input type="text" id="note-title" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="note-content">Isi Catatan</label>
+                        <textarea id="note-content" class="form-control" rows="5" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="note-tags">Tag (pisahkan dengan koma)</label>
+                        <input type="text" id="note-tags" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="note-public"> Tampilkan ke publik
+                        </label>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-accent">Simpan</button>
+                        <button type="button" id="cancel-note-btn" class="btn btn-outline">Batal</button>
+                        <button type="button" id="delete-note-btn" class="btn btn-danger hidden">Hapus</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <section id="profile-page" class="hidden">
+            <div class="profile-container">
+                <img id="current-avatar" src="https://files.catbox.moe/nzzva3.jpg" alt="Avatar" class="current-avatar">
+                <h2 id="profile-name">Nama Pengguna</h2>
+                <p id="profile-email">email@example.com</p>
+                
+                <button id="edit-profile-btn" class="btn btn-accent mt-2">Edit Profil</button>
+                
+                <div id="edit-profile-form" class="form-container mt-3 hidden">
+                    <h2 class="text-center">Edit Profil</h2>
+                    <form id="profile-form">
+                        <div class="form-group">
+                            <label for="profile-edit-name">Nama Lengkap</label>
+                            <input type="text" id="profile-edit-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-edit-email">Email</label>
+                            <input type="email" id="profile-edit-email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-edit-password">Password Baru (biarkan kosong jika tidak ingin mengubah)</label>
+                            <input type="password" id="profile-edit-password" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-edit-confirm-password">Konfirmasi Password Baru</label>
+                            <input type="password" id="profile-edit-confirm-password" class="form-control">
+                        </div>
+                        
+                        <h3 class="mt-3">Pilih Avatar</h3>
+                        <div class="avatar-selection">
+                            <img src="https://files.catbox.moe/nzzva3.jpg" alt="Avatar 1" class="avatar-option" data-avatar="0">
+                            <img src="https://files.catbox.moe/gnzyao.jpg" alt="Avatar 2" class="avatar-option" data-avatar="1">
+                            <img src="https://files.catbox.moe/sh0byu.jpg" alt="Avatar 3" class="avatar-option" data-avatar="2">
+                            <img src="https://files.catbox.moe/equjcm.jpg" alt="Avatar 4" class="avatar-option" data-avatar="3">
+                            <img src="https://files.catbox.moe/p12smv.jpg" alt="Avatar 5" class="avatar-option" data-avatar="4">
+                        </div>
+                        <input type="hidden" id="selected-avatar" value="0">
+                        
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-accent">Simpan Perubahan</button>
+                            <button type="button" id="cancel-profile-edit" class="btn btn-outline">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Configuration
+        const config = {
+            JWT_SECRET: "egunkari-premium-secret-2023",
+            SHEETDB_URL: "https://sheetdb.io/api/v1/jemf3q7ir4t8z",
+            SHEETDB_TOKEN: "h1pu5kqs97066x3setnvcvy8gpj4v2x2wxlfyqkv"
+        };
+
+        // Avatar options
+        const avatars = [
+            "https://files.catbox.moe/nzzva3.jpg",
+            "https://files.catbox.moe/gnzyao.jpg",
+            "https://files.catbox.moe/sh0byu.jpg",
+            "https://files.catbox.moe/equjcm.jpg",
+            "https://files.catbox.moe/p12smv.jpg"
+        ];
+
+        // App State
+        let currentUser = null;
+        let notes = [];
+        let users = [];
+
+        // DOM Elements
+        const pages = {
+            home: document.getElementById('home-page'),
+            login: document.getElementById('login-page'),
+            register: document.getElementById('register-page'),
+            dashboard: document.getElementById('dashboard-page'),
+            profile: document.getElementById('profile-page')
+        };
+
+        const navLinks = {
+            home: document.getElementById('nav-home'),
+            login: document.getElementById('nav-login'),
+            register: document.getElementById('nav-register'),
+            dashboard: document.getElementById('nav-dashboard'),
+            profile: document.getElementById('nav-profile'),
+            logout: document.getElementById('nav-logout')
+        };
+
+        // Utility Functions
+        function showPage(pageId) {
+            // Hide all pages
+            Object.values(pages).forEach(page => page.classList.add('hidden'));
+            
+            // Show the requested page
+            pages[pageId].classList.remove('hidden');
+            
+            // Update navigation based on authentication
+            updateNavigation();
+            
+            // Load data if needed
+            if (pageId === 'dashboard') {
+                loadNotes();
+            } else if (pageId === 'profile' && currentUser) {
+                loadProfile();
+            }
+        }
+
+        function updateNavigation() {
+            if (currentUser) {
+                // User is logged in
+                navLinks.login.classList.add('hidden');
+                navLinks.register.classList.add('hidden');
+                navLinks.dashboard.classList.remove('hidden');
+                navLinks.profile.classList.remove('hidden');
+                navLinks.logout.classList.remove('hidden');
+            } else {
+                // User is not logged in
+                navLinks.login.classList.remove('hidden');
+                navLinks.register.classList.remove('hidden');
+                navLinks.dashboard.classList.add('hidden');
+                navLinks.profile.classList.add('hidden');
+                navLinks.logout.classList.add('hidden');
+            }
+        }
+
+        function showAlert(elementId, message, isError = true) {
+            const alertElement = document.getElementById(elementId);
+            alertElement.textContent = message;
+            alertElement.classList.remove('hidden');
+            
+            if (isError) {
+                alertElement.classList.remove('alert-success');
+                alertElement.classList.add('alert-danger');
+            } else {
+                alertElement.classList.remove('alert-danger');
+                alertElement.classList.add('alert-success');
+            }
+            
+            setTimeout(() => {
+                alertElement.classList.add('hidden');
+            }, 5000);
+        }
+
+        function clearForm(formId) {
+            const form = document.getElementById(formId);
+            if (form) form.reset();
+        }
+
+        // API Functions
+        async function fetchData(endpoint, method = 'GET', data = null) {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.SHEETDB_TOKEN}`
+            };
+            
+            const options = {
+                method,
+                headers
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            try {
+                const response = await fetch(`${config.SHEETDB_URL}${endpoint}`, options);
+                return await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                return null;
+            }
+        }
+
+        // User Functions
+        async function loginUser(email, password) {
+            // In a real app, you would verify the password hash
+            const data = await fetchData(`?sheet=users`);
+            
+            if (data && data.length > 0) {
+                const user = data.find(u => u.email === email && u.password === password);
+                
+                if (user) {
+                    currentUser = {
+                        id: user.id,
+                        name: user.name,
+                        email: user.email,
+                        avatar: user.avatar || 0
+                    };
+                    
+                    // Store user in localStorage (insecure for production)
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    showPage('dashboard');
+                    clearForm('login-form');
+                    return true;
+                }
+            }
+            
+            showAlert('login-alert', 'Email atau password salah');
+            return false;
+        }
+
+        async function registerUser(name, email, password) {
+            // Check if user already exists
+            const data = await fetchData(`?sheet=users`);
+            
+            if (data && data.some(u => u.email === email)) {
+                showAlert('register-alert', 'Email sudah terdaftar');
+                return false;
+            }
+            
+            // Create new user
+            const newUser = {
+                name,
+                email,
+                password, // In a real app, you would hash the password
+                avatar: 0
+            };
+            
+            const response = await fetchData('?sheet=users', 'POST', newUser);
+            
+            if (response && response.created > 0) {
+                showAlert('register-alert', 'Registrasi berhasil! Silakan login', false);
+                clearForm('register-form');
+                showPage('login');
+                return true;
+            }
+            
+            showAlert('register-alert', 'Gagal melakukan registrasi');
+            return false;
+        }
+
+        function logoutUser() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showPage('home');
+        }
+
+        async function updateUserProfile(userId, name, email, password, avatar) {
+            const updateData = {
+                name,
+                email,
+                avatar
+            };
+            
+            if (password) {
+                updateData.password = password;
+            }
+            
+            const response = await fetchData(`/id/${userId}?sheet=users`, 'PATCH', updateData);
+            
+            if (response && response.updated > 0) {
+                currentUser = {
+                    ...currentUser,
+                    name,
+                    email,
+                    avatar
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showAlert('profile-alert', 'Profil berhasil diperbarui!', false);
+                return true;
+            }
+            
+            showAlert('profile-alert', 'Gagal memperbarui profil');
+            return false;
+        }
+
+        // Note Functions
+        async function loadNotes() {
+            const data = await fetchData(`?sheet=notes`);
+            
+            if (data) {
+                notes = data;
+                renderNotes();
+            }
+        }
+
+        function renderNotes() {
+            const notesList = document.getElementById('notes-list');
+            notesList.innerHTML = '';
+            
+            // Filter notes to show only current user's notes and public notes
+            const filteredNotes = notes.filter(note => 
+                note.user_id === currentUser.id || note.public === '1'
+            );
+            
+            if (filteredNotes.length === 0) {
+                notesList.innerHTML = '<p>Tidak ada catatan yang tersedia.</p>';
+                return;
+            }
+            
+            filteredNotes.forEach(note => {
+                const user = users.find(u => u.id === note.user_id) || { name: 'Unknown' };
+                
+                const noteCard = document.createElement('div');
+                noteCard.className = 'note-card';
+                noteCard.innerHTML = `
+                    <h3 class="note-title">${note.title}</h3>
+                    <div class="note-content">${note.content}</div>
+                    <div class="note-meta">
+                        <span>Oleh: ${user.name}</span>
+                        <span>${new Date(note.created_at).toLocaleDateString()}</span>
+                    </div>
+                    ${note.user_id === currentUser.id ? `
+                    <div class="note-actions">
+                        <button class="btn btn-accent edit-note-btn" data-id="${note.id}">Edit</button>
+                        <button class="btn btn-danger delete-note-btn" data-id="${note.id}">Hapus</button>
+                    </div>
+                    ` : ''}
+                `;
+                
+                notesList.appendChild(noteCard);
+            });
+            
+            // Add event listeners to buttons
+            document.querySelectorAll('.edit-note-btn').forEach(btn => {
+                btn.addEventListener('click', () => editNote(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.delete-note-btn').forEach(btn => {
+                btn.addEventListener('click', () => deleteNote(btn.dataset.id));
+            });
+        }
+
+        async function saveNote(noteId, title, content, tags, isPublic) {
+            const noteData = {
+                title,
+                content,
+                tags,
+                public: isPublic ? '1' : '0',
+                user_id: currentUser.id,
+                created_at: new Date().toISOString()
+            };
+            
+            let response;
+            
+            if (noteId) {
+                // Update existing note
+                response = await fetchData(`/id/${noteId}?sheet=notes`, 'PATCH', noteData);
+            } else {
+                // Create new note
+                response = await fetchData('?sheet=notes', 'POST', noteData);
+            }
+            
+            if (response) {
+                if (noteId && response.updated > 0) {
+                    showAlert('note-alert', 'Catatan berhasil diperbarui!', false);
+                } else if (!noteId && response.created > 0) {
+                    showAlert('note-alert', 'Catatan berhasil ditambahkan!', false);
+                }
+                
+                loadNotes();
+                return true;
+            }
+            
+            showAlert('note-alert', 'Gagal menyimpan catatan');
+            return false;
+        }
+
+        async function deleteNote(noteId) {
+            if (confirm('Apakah Anda yakin ingin menghapus catatan ini?')) {
+                const response = await fetchData(`/id/${noteId}?sheet=notes`, 'DELETE');
+                
+                if (response && response.deleted > 0) {
+                    showAlert('note-alert', 'Catatan berhasil dihapus!', false);
+                    loadNotes();
+                    return true;
+                }
+                
+                showAlert('note-alert', 'Gagal menghapus catatan');
+            }
+            return false;
+        }
+
+        function editNote(noteId) {
+            const note = notes.find(n => n.id === noteId);
+            
+            if (note) {
+                document.getElementById('note-modal-title').textContent = 'Edit Catatan';
+                document.getElementById('note-id').value = note.id;
+                document.getElementById('note-title').value = note.title;
+                document.getElementById('note-content').value = note.content;
+                document.getElementById('note-tags').value = note.tags || '';
+                document.getElementById('note-public').checked = note.public === '1';
+                document.getElementById('delete-note-btn').classList.remove('hidden');
+                
+                document.getElementById('note-modal').classList.remove('hidden');
+            }
+        }
+
+        function showAddNoteModal() {
+            document.getElementById('note-modal-title').textContent = 'Tambah Catatan Baru';
+            document.getElementById('note-form').reset();
+            document.getElementById('note-id').value = '';
+            document.getElementById('delete-note-btn').classList.add('hidden');
+            document.getElementById('note-modal').classList.remove('hidden');
+        }
+
+        // Profile Functions
+        function loadProfile() {
+            if (!currentUser) return;
+            
+            document.getElementById('profile-name').textContent = currentUser.name;
+            document.getElementById('profile-email').textContent = currentUser.email;
+            document.getElementById('current-avatar').src = avatars[currentUser.avatar];
+            
+            // Set form values
+            document.getElementById('profile-edit-name').value = currentUser.name;
+            document.getElementById('profile-edit-email').value = currentUser.email;
+            document.getElementById('selected-avatar').value = currentUser.avatar;
+            
+            // Highlight selected avatar
+            document.querySelectorAll('.avatar-option').forEach(option => {
+                option.classList.remove('selected');
+                if (parseInt(option.dataset.avatar) === currentUser.avatar) {
+                    option.classList.add('selected');
+                }
+            });
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                currentUser = JSON.parse(storedUser);
+                showPage('dashboard');
+            } else {
+                showPage('home');
+            }
+            
+            // Navigation
+            navLinks.home.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('home');
+            });
+            
+            navLinks.login.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('login');
+            });
+            
+            navLinks.register.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('register');
+            });
+            
+            navLinks.dashboard.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('dashboard');
+            });
+            
+            navLinks.profile.addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('profile');
+            });
+            
+            navLinks.logout.addEventListener('click', (e) => {
+                e.preventDefault();
+                logoutUser();
+            });
+            
+            // Home page buttons
+            document.getElementById('home-login-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('login');
+            });
+            
+            document.getElementById('home-register-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('register');
+            });
+            
+            // Login form
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                
+                await loginUser(email, password);
+            });
+            
+            document.getElementById('login-to-register').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('register');
+            });
+            
+            // Register form
+            document.getElementById('register-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('register-name').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm-password').value;
+                
+                if (password !== confirmPassword) {
+                    showAlert('register-alert', 'Password dan konfirmasi password tidak cocok');
+                    return;
+                }
+                
+                await registerUser(name, email, password);
+            });
+            
+            document.getElementById('register-to-login').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('login');
+            });
+            
+            // Dashboard
+            document.getElementById('add-note-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showAddNoteModal();
+            });
+            
+            // Note modal
+            document.getElementById('note-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const noteId = document.getElementById('note-id').value;
+                const title = document.getElementById('note-title').value;
+                const content = document.getElementById('note-content').value;
+                const tags = document.getElementById('note-tags').value;
+                const isPublic = document.getElementById('note-public').checked;
+                
+                await saveNote(noteId, title, content, tags, isPublic);
+                document.getElementById('note-modal').classList.add('hidden');
+            });
+            
+            document.getElementById('cancel-note-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('note-modal').classList.add('hidden');
+            });
+            
+            document.getElementById('delete-note-btn').addEventListener('click', async (e) => {
+                e.preventDefault();
+                const noteId = document.getElementById('note-id').value;
+                
+                if (await deleteNote(noteId)) {
+                    document.getElementById('note-modal').classList.add('hidden');
+                }
+            });
+            
+            // Profile
+            document.getElementById('edit-profile-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('edit-profile-form').classList.remove('hidden');
+            });
+            
+            document.getElementById('cancel-profile-edit').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('edit-profile-form').classList.add('hidden');
+            });
+            
+            // Avatar selection
+            document.querySelectorAll('.avatar-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('.avatar-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    
+                    option.classList.add('selected');
+                    document.getElementById('selected-avatar').value = option.dataset.avatar;
+                });
+            });
+            
+            // Profile form
+            document.getElementById('profile-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const name = document.getElementById('profile-edit-name').value;
+                const email = document.getElementById('profile-edit-email').value;
+                const password = document.getElementById('profile-edit-password').value;
+                const confirmPassword = document.getElementById('profile-edit-confirm-password').value;
+                const avatar = parseInt(document.getElementById('selected-avatar').value);
+                
+                if (password && password !== confirmPassword) {
+                    showAlert('profile-alert', 'Password dan konfirmasi password tidak cocok');
+                    return;
+                }
+                
+                if (await updateUserProfile(currentUser.id, name, email, password, avatar)) {
+                    document.getElementById('edit-profile-form').classList.add('hidden');
+                    loadProfile();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
