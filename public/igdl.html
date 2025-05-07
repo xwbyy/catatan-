@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>RyLac AI Chat - TOOLS Multi Fungsi</title>
+    <meta name="description" content="RyLac AI Chat adalah asisten cerdas multi-fungsi yang siap membantu berbagai kebutuhan Anda, dari chatting hingga tools praktis.">
+    <meta name="keywords" content="RyLac, AI Chat, Tools, Multi Fungsi, Asisten Virtual, OpenAI, ChatGPT">
+    <meta name="author" content="Zayn dan Reni">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://files.catbox.moe/zj48ha.jpg" type="image/jpeg">
+    
+    <!-- Open Graph (untuk berbagi di media sosial) -->
+    <meta property="og:title" content="RyLac AI Chat - TOOLS Multi Fungsi">
+    <meta property="og:description" content="Asisten AI pintar dan ceria siap menemani dan membantu aktivitas Anda.">
+    <meta property="og:image" content="https://files.catbox.moe/zj48ha.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://namasitusanda.com">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --ios-blur: rgba(255, 255, 255, 0.8);
+            --ios-primary: #007AFF;
+            --ios-secondary: rgba(120, 120, 128, 0.12);
+            --ios-text: #000;
+            --ios-text-secondary: rgba(60, 60, 67, 0.6);
+            --ios-danger: #FF3B30;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --ios-blur: rgba(44, 44, 46, 0.8);
+                --ios-primary: #0A84FF;
+                --ios-secondary: rgba(120, 120, 128, 0.24);
+                --ios-text: #FFF;
+                --ios-text-secondary: rgba(235, 235, 245, 0.6);
+                --ios-danger: #FF453A;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f2f2f7;
+            color: var(--ios-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-image: url('https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            filter: blur(20px);
+            z-index: -1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 40px;
+            background: var(--ios-blur);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--ios-secondary);
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header .logo {
+            font-weight: bold;
+            color: var(--ios-primary);
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--ios-text);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 17px;
+            border: 1px solid var(--ios-secondary);
+            border-radius: 10px;
+            background: rgba(120, 120, 128, 0.12);
+            color: var(--ios-text);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--ios-primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--ios-primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 17px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            background-color: var(--ios-secondary);
+            color: var(--ios-text-secondary);
+            cursor: not-allowed;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-danger {
+            background-color: var(--ios-danger);
+        }
+
+        .result-container {
+            margin-top: 20px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .media-container {
+            width: 100%;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            background-color: rgba(0, 0, 0, 0.05);
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .media-thumbnail {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .media-preview {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .play-icon {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.9;
+        }
+
+        .play-icon svg {
+            width: 30px;
+            height: 30px;
+            color: white;
+            margin-left: 4px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--ios-primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .error-message {
+            color: var(--ios-danger);
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+            font-size: 15px;
+        }
+
+        .success-message {
+            color: var(--ios-primary);
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+            font-size: 15px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: var(--ios-text-secondary);
+            font-size: 13px;
+            max-width: 600px;
+            padding: 0 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                margin-top: 20px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><span class="logo">RyLac TOOLS</span> - Instagram Downloader</h1>
+        </div>
+        <div class="content">
+            <div class="input-group">
+                <label for="url-input" class="input-label">Instagram URL</label>
+                <input type="url" id="url-input" class="input-field" placeholder="https://www.instagram.com/p/..." autocomplete="off">
+            </div>
+            <button id="download-btn" class="btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Download
+            </button>
+            <div class="error-message" id="error-message"></div>
+            <div class="success-message" id="success-message"></div>
+            
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Processing your request...</p>
+            </div>
+            
+            <div class="result-container" id="result-container">
+                <div class="media-container" id="media-container">
+                    <img id="media-thumbnail" class="media-thumbnail" src="" alt="Instagram thumbnail">
+                    <img id="media-image" class="media-preview" src="" alt="Instagram image">
+                    <video id="media-video" class="media-preview" controls></video>
+                    <div id="play-button" class="play-icon" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <a id="download-link" class="btn download-btn" download>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download
+                    </a>
+                    <button id="clear-btn" class="btn btn-danger">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 6h18"></path>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Paste Instagram post, reel, or story URL to download high-quality photos or videos</p>
+        <p>RyLac TOOLS &copy; 2024 - All rights reserved</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlInput = document.getElementById('url-input');
+            const downloadBtn = document.getElementById('download-btn');
+            const loading = document.getElementById('loading');
+            const resultContainer = document.getElementById('result-container');
+            const mediaContainer = document.getElementById('media-container');
+            const mediaThumbnail = document.getElementById('media-thumbnail');
+            const mediaImage = document.getElementById('media-image');
+            const mediaVideo = document.getElementById('media-video');
+            const playButton = document.getElementById('play-button');
+            const downloadLink = document.getElementById('download-link');
+            const clearBtn = document.getElementById('clear-btn');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+            
+            // Event listeners
+            downloadBtn.addEventListener('click', downloadMedia);
+            clearBtn.addEventListener('click', clearResults);
+            urlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    downloadMedia();
+                }
+            });
+            
+            mediaContainer.addEventListener('click', function() {
+                if (playButton.style.display === 'flex') {
+                    mediaThumbnail.style.display = 'none';
+                    playButton.style.display = 'none';
+                    mediaVideo.style.display = 'block';
+                    mediaVideo.play();
+                }
+            });
+            
+            function downloadMedia() {
+                const url = urlInput.value.trim();
+                
+                if (!url) {
+                    showError('Please enter an Instagram URL');
+                    return;
+                }
+                
+                if (!isValidInstagramUrl(url)) {
+                    showError('Please enter a valid Instagram URL (post, reel, or story)');
+                    return;
+                }
+                
+                // Reset UI
+                hideMessages();
+                resultContainer.style.display = 'none';
+                loading.style.display = 'flex';
+                downloadBtn.disabled = true;
+                
+                // Encode the URL for the API
+                const encodedUrl = encodeURIComponent(url);
+                const apiUrl = `https://api.ryzumi.vip/api/downloader/igdl?url=${encodedUrl}`;
+                
+                fetch(apiUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status && data.data && data.data.length > 0) {
+                            const media = data.data[0];
+                            displayMedia(media);
+                            showSuccess('Media loaded successfully!');
+                        } else {
+                            throw new Error('No media found in the response');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showError('Failed to download. Please check the URL and try again.');
+                    })
+                    .finally(() => {
+                        loading.style.display = 'none';
+                        downloadBtn.disabled = false;
+                    });
+            }
+            
+            function isValidInstagramUrl(url) {
+                const instagramRegex = /^https?:\/\/(www\.)?instagram\.com\/(p|reel|tv|reels|stories)\/[a-zA-Z0-9_-]+\/?/;
+                return instagramRegex.test(url);
+            }
+            
+            function displayMedia(media) {
+                // Reset media elements
+                mediaThumbnail.style.display = 'block';
+                mediaImage.style.display = 'none';
+                mediaVideo.style.display = 'none';
+                playButton.style.display = 'none';
+                
+                // Set thumbnail
+                mediaThumbnail.src = media.thumbnail || media.url;
+                mediaThumbnail.onerror = function() {
+                    this.src = 'https://via.placeholder.com/500?text=Thumbnail+not+available';
+                };
+                
+                // Determine if it's a video or image
+                const isVideo = media.url.includes('.mp4') || media.url.includes('.mov');
+                
+                if (isVideo) {
+                    // Set video source
+                    mediaVideo.src = media.url;
+                    mediaVideo.poster = media.thumbnail || '';
+                    playButton.style.display = 'flex';
+                } else {
+                    // Set image source
+                    mediaImage.src = media.url;
+                }
+                
+                // Set download link
+                downloadLink.href = media.url;
+                const filename = isVideo ? 'instagram-video.mp4' : 'instagram-image.jpg';
+                downloadLink.setAttribute('download', filename);
+                
+                // Show result container
+                resultContainer.style.display = 'block';
+            }
+            
+            function clearResults() {
+                urlInput.value = '';
+                resultContainer.style.display = 'none';
+                hideMessages();
+            }
+            
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+            }
+            
+            function showSuccess(message) {
+                successMessage.textContent = message;
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
+            }
+            
+            function hideMessages() {
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
