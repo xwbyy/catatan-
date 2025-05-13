@@ -4,13 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>RyLac - AI Image Enhancer & Upscaler</title>
-    <meta name="description" content="Enhance and upscale your images with AI-powered technology">
-    <meta name="keywords" content="RyLac, Image Enhancer, Photo Upscaler, AI Image, Quality Improvement">
+    <title>RyLac AI Chat - TOOLS Multi Fungsi</title>
+    <meta name="description" content="RyLac AI Chat adalah asisten cerdas multi-fungsi yang siap membantu berbagai kebutuhan Anda, dari chatting hingga tools praktis.">
+    <meta name="keywords" content="RyLac, AI Chat, Tools, Multi Fungsi, Asisten Virtual, OpenAI, ChatGPT">
     <meta name="author" content="Zayn dan Reni">
     
     <!-- Favicon -->
     <link rel="icon" href="https://files.catbox.moe/zj48ha.jpg" type="image/jpeg">
+    
+    <!-- Open Graph (untuk berbagi di media sosial) -->
+    <meta property="og:title" content="RyLac AI Chat - TOOLS Multi Fungsi">
+    <meta property="og:description" content="Asisten AI pintar dan ceria siap menemani dan membantu aktivitas Anda.">
+    <meta property="og:image" content="https://files.catbox.moe/zj48ha.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://namasitusanda.com">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -204,15 +211,6 @@
             background: #0062CC;
         }
 
-        .btn-secondary {
-            background: var(--secondary);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #2CA24F;
-        }
-
         .btn:disabled {
             background: #AEAEB2;
             cursor: not-allowed;
@@ -282,42 +280,6 @@
             font-size: 0.8rem;
         }
 
-        .tab-container {
-            display: flex;
-            margin-bottom: 15px;
-            border-bottom: 1px solid var(--ios-secondary);
-        }
-
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .tab.active {
-            border-bottom: 3px solid var(--primary);
-            font-weight: 500;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-group .btn {
-            flex: 1;
-        }
-
         @media (max-width: 600px) {
             .header h1 {
                 font-size: 1.5rem;
@@ -331,17 +293,8 @@
                 flex-direction: column;
             }
             
-            .btn, .btn-group .btn {
+            .btn {
                 width: 100%;
-            }
-            
-            .tab-container {
-                justify-content: space-between;
-            }
-            
-            .tab {
-                padding: 10px;
-                font-size: 0.9rem;
             }
         }
     </style>
@@ -352,8 +305,8 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>RyLac - AI Image Tools</h1>
-            <p>Enhance and upscale your images with AI technology</p>
+            <h1>Face Blur Tool</h1>
+            <p>Protect privacy by blurring faces in your images</p>
         </div>
         
         <!-- Upload Section -->
@@ -380,33 +333,18 @@
             <div id="upload-status" class="status"></div>
         </div>
         
-        <!-- Processing Section -->
+        <!-- Process Section -->
         <div class="section">
-            <h2 class="section-title"><i class="fas fa-magic"></i> Processing Options</h2>
+            <h2 class="section-title"><i class="fas fa-user-secret"></i> Process Image</h2>
             
             <div id="before-process" class="preview-container">
                 <h3>Original Image</h3>
                 <img id="original-image" class="preview-image" src="" alt="Original image">
             </div>
             
-            <div class="tab-container">
-                <div class="tab active" data-tab="upscale">Upscale</div>
-                <div class="tab" data-tab="enhance">Enhance</div>
-            </div>
-            
-            <div class="tab-content active" id="upscale-tab">
-                <p>Increase the resolution of your image while maintaining quality.</p>
-                <button id="upscale-btn" class="btn btn-primary" disabled>
-                    <i class="fas fa-expand"></i> Upscale Image
-                </button>
-            </div>
-            
-            <div class="tab-content" id="enhance-tab">
-                <p>Improve image quality, fix blur, and enhance details (Remini-style).</p>
-                <button id="enhance-btn" class="btn btn-secondary" disabled>
-                    <i class="fas fa-star"></i> Enhance Image
-                </button>
-            </div>
+            <button id="blur-faces-btn" class="btn btn-primary" disabled>
+                <i class="fas fa-eye-slash"></i> Blur Faces
+            </button>
             
             <div id="process-status" class="status"></div>
         </div>
@@ -426,19 +364,14 @@
                 </div>
             </div>
             
-            <div class="btn-group">
-                <button id="download-btn" class="btn btn-primary">
-                    <i class="fas fa-download"></i> Download
-                </button>
-                <button id="new-image-btn" class="btn">
-                    <i class="fas fa-redo"></i> New Image
-                </button>
-            </div>
+            <button id="download-btn" class="btn btn-primary">
+                <i class="fas fa-download"></i> Download Processed Image
+            </button>
         </div>
         
         <!-- Footer -->
         <div class="footer">
-            <p>© 2024 RyLac - AI Image Tools</p>
+            <p>© 2024 Face Blur Tool - Protect Privacy in Images</p>
         </div>
     </div>
 
@@ -458,26 +391,19 @@
             // Process
             beforeProcess: document.getElementById('before-process'),
             originalImage: document.getElementById('original-image'),
-            upscaleBtn: document.getElementById('upscale-btn'),
-            enhanceBtn: document.getElementById('enhance-btn'),
+            blurFacesBtn: document.getElementById('blur-faces-btn'),
             processStatus: document.getElementById('process-status'),
-            
-            // Tabs
-            tabs: document.querySelectorAll('.tab'),
-            tabContents: document.querySelectorAll('.tab-content'),
             
             // Result
             resultContainer: document.getElementById('result-container'),
             beforeImage: document.getElementById('before-image'),
             processedImage: document.getElementById('processed-image'),
-            downloadBtn: document.getElementById('download-btn'),
-            newImageBtn: document.getElementById('new-image-btn')
+            downloadBtn: document.getElementById('download-btn')
         };
 
         // Global Variables
         let currentImageUrl = '';
         let processedImageUrl = '';
-        let currentProcessType = 'upscale';
 
         // File Upload Handling
         elements.imageUpload.addEventListener('change', (e) => {
@@ -522,19 +448,6 @@
             }
         });
 
-        // Tab Switching
-        elements.tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                elements.tabs.forEach(t => t.classList.remove('active'));
-                elements.tabContents.forEach(c => c.classList.remove('active'));
-                
-                tab.classList.add('active');
-                const tabId = tab.getAttribute('data-tab');
-                document.getElementById(`${tabId}-tab`).classList.add('active');
-                currentProcessType = tabId;
-            });
-        });
-
         // Upload Image to CDN
         elements.uploadBtn.addEventListener('click', async () => {
             const file = elements.imageUpload.files[0];
@@ -569,9 +482,8 @@
                     elements.originalImage.src = elements.uploadedImage.src;
                     elements.beforeProcess.style.display = 'block';
                     
-                    // Enable process buttons
-                    elements.upscaleBtn.disabled = false;
-                    elements.enhanceBtn.disabled = false;
+                    // Enable process button
+                    elements.blurFacesBtn.disabled = false;
                     
                     showStatus(elements.uploadStatus, 'Image uploaded successfully!', 'success');
                 } else {
@@ -585,8 +497,8 @@
             }
         });
 
-        // Upscale Image
-        elements.upscaleBtn.addEventListener('click', async () => {
+        // Blur Faces
+        elements.blurFacesBtn.addEventListener('click', async () => {
             if (!currentImageUrl) {
                 showStatus(elements.processStatus, 'Please upload an image first.', 'error');
                 return;
@@ -594,21 +506,16 @@
             
             try {
                 // Disable button and show loading
-                elements.upscaleBtn.disabled = true;
-                elements.enhanceBtn.disabled = true;
-                showStatus(elements.processStatus, 'Upscaling image... This may take a moment.', 'info');
+                elements.blurFacesBtn.disabled = true;
+                showStatus(elements.processStatus, 'Blurring faces...', 'info');
                 
                 // Encode image URL
                 const encodedUrl = encodeURIComponent(currentImageUrl);
                 
-                // Call Upscaler API
-                const apiUrl = `https://api.ryzumi.vip/api/ai/upscaler?url=${encodedUrl}`;
+                // Call Face Blur API
+                const apiUrl = `https://api.siputzx.my.id/api/iloveimg/blurface?image=${encodedUrl}`;
                 
-                const response = await fetch(apiUrl, {
-                    headers: {
-                        'accept': 'image/png'
-                    }
-                });
+                const response = await fetch(apiUrl);
                 
                 if (response.ok) {
                     // Convert response to image
@@ -616,108 +523,36 @@
                     processedImageUrl = URL.createObjectURL(imageBlob);
                     
                     // Show results
-                    showProcessedResult();
+                    elements.beforeImage.src = elements.originalImage.src;
+                    elements.processedImage.src = processedImageUrl;
+                    elements.resultContainer.style.display = 'block';
                     
-                    showStatus(elements.processStatus, 'Image upscaled successfully!', 'success');
+                    // Scroll to result
+                    elements.resultContainer.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Set up download
+                    elements.downloadBtn.onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = processedImageUrl;
+                        a.download = `face-blurred-${Date.now()}.png`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    };
+                    
+                    showStatus(elements.processStatus, 'Faces blurred successfully!', 'success');
                 } else {
-                    throw new Error('Upscaling failed');
+                    throw new Error('Face blur failed');
                 }
             } catch (error) {
-                console.error('Upscaling error:', error);
-                showStatus(elements.processStatus, 'Failed to upscale image. Please try again.', 'error');
+                console.error('Face blur error:', error);
+                showStatus(elements.processStatus, 'Failed to blur faces. Please try again.', 'error');
             } finally {
-                elements.upscaleBtn.disabled = false;
-                elements.enhanceBtn.disabled = false;
+                elements.blurFacesBtn.disabled = false;
             }
-        });
-
-        // Enhance Image (Remini-style)
-        elements.enhanceBtn.addEventListener('click', async () => {
-            if (!currentImageUrl) {
-                showStatus(elements.processStatus, 'Please upload an image first.', 'error');
-                return;
-            }
-            
-            try {
-                // Disable button and show loading
-                elements.upscaleBtn.disabled = true;
-                elements.enhanceBtn.disabled = true;
-                showStatus(elements.processStatus, 'Enhancing image... This may take a moment.', 'info');
-                
-                // Encode image URL
-                const encodedUrl = encodeURIComponent(currentImageUrl);
-                
-                // Call Enhancer API
-                const apiUrl = `https://api.ryzumi.vip/api/ai/remini?url=${encodedUrl}`;
-                
-                const response = await fetch(apiUrl, {
-                    headers: {
-                        'accept': 'image/png'
-                    }
-                });
-                
-                if (response.ok) {
-                    // Convert response to image
-                    const imageBlob = await response.blob();
-                    processedImageUrl = URL.createObjectURL(imageBlob);
-                    
-                    // Show results
-                    showProcessedResult();
-                    
-                    showStatus(elements.processStatus, 'Image enhanced successfully!', 'success');
-                } else {
-                    throw new Error('Enhancement failed');
-                }
-            } catch (error) {
-                console.error('Enhancement error:', error);
-                showStatus(elements.processStatus, 'Failed to enhance image. Please try again.', 'error');
-            } finally {
-                elements.upscaleBtn.disabled = false;
-                elements.enhanceBtn.disabled = false;
-            }
-        });
-
-        // Download Button
-        elements.downloadBtn.addEventListener('click', () => {
-            if (processedImageUrl) {
-                const a = document.createElement('a');
-                a.href = processedImageUrl;
-                a.download = `processed-${Date.now()}.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            }
-        });
-
-        // New Image Button
-        elements.newImageBtn.addEventListener('click', () => {
-            // Reset the form
-            elements.imageUpload.value = '';
-            elements.uploadText.style.display = 'block';
-            elements.fileName.style.display = 'none';
-            elements.fileName.textContent = '';
-            elements.uploadPreview.style.display = 'none';
-            elements.uploadedImage.src = '';
-            elements.beforeProcess.style.display = 'none';
-            elements.originalImage.src = '';
-            elements.resultContainer.style.display = 'none';
-            elements.processStatus.style.display = 'none';
-            elements.upscaleBtn.disabled = true;
-            elements.enhanceBtn.disabled = true;
-            currentImageUrl = '';
-            processedImageUrl = '';
         });
 
         // Helper Functions
-        function showProcessedResult() {
-            elements.beforeImage.src = elements.originalImage.src;
-            elements.processedImage.src = processedImageUrl;
-            elements.resultContainer.style.display = 'block';
-            
-            // Scroll to result
-            elements.resultContainer.scrollIntoView({ behavior: 'smooth' });
-        }
-
         function showStatus(element, message, type) {
             element.textContent = message;
             element.className = 'status';
