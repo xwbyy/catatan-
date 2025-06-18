@@ -574,10 +574,22 @@ input:checked + .slider:before {
     overflow-x: auto;
 }
 
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.code-language {
+    font-size: 12px;
+    color: var(--subtext-color);
+    text-transform: uppercase;
+}
+
 .copy-button {
-    position: absolute;
-    top: 4px;
-    right: 4px;
     background-color: var(--primary-color);
     color: white;
     border: none;
@@ -585,12 +597,19 @@ input:checked + .slider:before {
     padding: 4px 8px;
     font-size: 12px;
     cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
-.code-block:hover .copy-button {
-    opacity: 1;
+.copy-button:hover {
+    background-color: #0062CC;
+}
+
+pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .modal-overlay {
@@ -728,4 +747,40 @@ input:checked + .slider:before {
 .toast.show {
     opacity: 1;
     visibility: visible;
+}
+
+.history-item {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.history-item:hover {
+    background-color: rgba(0, 122, 255, 0.1);
+}
+
+.history-title {
+    font-weight: 500;
+}
+
+.history-time {
+    font-size: 12px;
+    color: var(--subtext-color);
+    margin-top: 4px;
+}
+
+.history-model {
+    font-size: 12px;
+    color: var(--subtext-color);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.no-history {
+    color: var(--subtext-color);
+    text-align: center;
+    padding: 20px 0;
 }

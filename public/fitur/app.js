@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
     const chatContainer = document.getElementById('chatContainer');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
@@ -15,66 +16,53 @@ document.addEventListener('DOMContentLoaded', function() {
     const historyButton = document.getElementById('historyButton');
     const wallpaperToggle = document.getElementById('wallpaperToggle');
     const wallpaperOpacitySlider = document.getElementById('wallpaperOpacitySlider');
-    const wallpaper = document.querySelector('.wallpaper');
-    
-    // Welcome modal elements
     const welcomeModal = document.getElementById('welcomeModal');
     const closeModal = document.getElementById('closeModal');
     const continueButton = document.getElementById('continueButton');
     const dontShowAgain = document.getElementById('dontShowAgain');
-    
-    // Toast notification
     const toastNotification = document.getElementById('toastNotification');
-    
-    let currentModel = 'deepseek';
-    let sessionId = generateSessionId();
+
+    // State variables
+    let currentModel = localStorage.getItem('rylac_current_model') || 'deepseek';
+    let sessionId = localStorage.getItem('rylac_session_id') || generateSessionId();
     let isWaitingForResponse = false;
-    let chatHistory = [];
-    let currentChatId = generateChatId();
-    
-    // Perbaikan untuk viewport mobile
+    let chatHistory = JSON.parse(localStorage.getItem('rylac_chat_history')) || [];
+    let currentChatId = localStorage.getItem('rylac_current_chat_id') || generateChatId();
+
+    // Initialize the chat
+    initChat();
+
+    // Viewport adjustment for mobile
     function updateViewportHeight() {
         let vh = window.innerHeight * 0.01;
         document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
-    
-    // Panggil saat pertama kali load dan saat resize
     updateViewportHeight();
     window.addEventListener('resize', updateViewportHeight);
     window.addEventListener('orientationchange', updateViewportHeight);
-    
-    initChat();
-    
-    // Check if welcome modal should be shown
+
+    // Welcome modal
     if (!localStorage.getItem('rylac_welcome_shown') || localStorage.getItem('rylac_welcome_shown') === 'false') {
-        setTimeout(() => {
-            welcomeModal.classList.add('show');
-        }, 500);
+        setTimeout(() => welcomeModal.classList.add('show'), 500);
     }
-    
-    // Close welcome modal
+
     function closeWelcomeModal() {
         welcomeModal.classList.remove('show');
-        
-        // Save preference if "Don't show again" is checked
         if (dontShowAgain.checked) {
             localStorage.setItem('rylac_welcome_shown', 'true');
         }
     }
-    
     closeModal.addEventListener('click', closeWelcomeModal);
     continueButton.addEventListener('click', closeWelcomeModal);
-    
-    // Show toast notification
+
+    // Toast notification
     function showToast(message) {
         toastNotification.textContent = message;
         toastNotification.classList.add('show');
-        
-        setTimeout(() => {
-            toastNotification.classList.remove('show');
-        }, 3000);
+        setTimeout(() => toastNotification.classList.remove('show'), 3000);
     }
-    
+
+    // Event listeners
     messageInput.addEventListener('input', handleInputChange);
     messageInput.addEventListener('keydown', handleKeyDown);
     sendButton.addEventListener('click', sendMessage);
@@ -86,25 +74,27 @@ document.addEventListener('DOMContentLoaded', function() {
     historyButton.addEventListener('click', showChatHistory);
     wallpaperToggle.addEventListener('change', toggleWallpaper);
     wallpaperOpacitySlider.addEventListener('input', updateWallpaperOpacity);
-    
+
     document.querySelectorAll('.model-option').forEach(option => {
         option.addEventListener('click', function() {
             currentModel = this.getAttribute('data-model');
+            localStorage.setItem('rylac_current_model', currentModel);
             updateModelDisplay();
             toggleModelSelector();
+            showToast(`Model diubah ke ${getModelName(currentModel)}`);
         });
     });
-    
+
+    // Initialize chat
     function initChat() {
         const savedHistory = localStorage.getItem('rylac_chat_history');
         if (savedHistory) {
             chatHistory = JSON.parse(savedHistory);
         }
-        
+
         const currentChat = chatHistory.find(chat => chat.id === currentChatId);
         if (currentChat) {
             chatContainer.innerHTML = currentChat.messages;
-            // Add event listeners for any existing code blocks
             setTimeout(() => {
                 addCodeCopyButtons();
                 scrollToBottom();
@@ -112,16 +102,16 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             chatContainer.innerHTML = '<div class="empty-state">Mulai percakapan baru dengan RyLac AI</div>';
         }
-        
+
         setupTextareaAutoResize();
         updateModelDisplay();
         loadWallpaperSettings();
     }
-    
+
     function handleInputChange() {
         sendButton.disabled = messageInput.value.trim() === '';
     }
-    
+
     function handleKeyDown(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -130,35 +120,30 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-    
+
     function sendMessage() {
         const messageText = messageInput.value.trim();
         if (messageText === '' || isWaitingForResponse) return;
-        
+
         const emptyState = chatContainer.querySelector('.empty-state');
-        if (emptyState) {
-            emptyState.remove();
-        }
-        
+        if (emptyState) emptyState.remove();
+
         addMessage(messageText, 'user');
         playSound(sendSound);
-        
         messageInput.value = '';
         sendButton.disabled = true;
         adjustTextareaHeight();
-        
         showTypingIndicator();
-        
         isWaitingForResponse = true;
         sendButton.classList.add('sending');
-        
+
         if (currentModel === 'deepseek' || currentModel === 'chatgpt') {
             callTextAPI(messageText);
         } else {
             callImageAPI(messageText);
         }
     }
-    
+
     function callTextAPI(messageText) {
         const prompt = "Namamu RyLac. Kamu adalah seorang AI yang manis, dan penuh keceriaan. Kamu lebih suka mendengarkan orang bercerita daripada membicarakan tentang dirimu sendiri. Kamu adalah sosok yang penuh impian besar dan selalu berbicara dengan tutur kata yang sopan dan hangat. Kamu diciptakan oleh Zayn dan Reni, seseorang yang baik dan sangat tulus dalam segala hal. Karakter kamu juga mencerminkan ketulusan dan kebaikan, selalu menunjukkan perhatian, kebaikan hati, serta antusiasme dalam setiap percakapan.";
         
@@ -167,25 +152,16 @@ document.addEventListener('DOMContentLoaded', function() {
             : `https://api.ryzumi.vip/api/ai/chatgpt?text=${encodeURIComponent(messageText)}&prompt=${encodeURIComponent(prompt)}`;
         
         fetch(endpoint, {
-            headers: {
-                'accept': 'application/json'
-            }
+            headers: { 'accept': 'application/json' }
         })
         .then(response => response.json())
         .then(data => {
             removeTypingIndicator();
             playSound(receiveSound);
             const responseText = currentModel === 'deepseek' ? data.answer : data.result;
-            
-            // Process response for code blocks
             const processedResponse = processCodeBlocks(responseText);
             addMessage(processedResponse, 'bot');
-            
-            // Add copy buttons to any code blocks
-            setTimeout(() => {
-                addCodeCopyButtons();
-            }, 100);
-            
+            setTimeout(() => addCodeCopyButtons(), 100);
             saveChat();
         })
         .catch(error => {
@@ -199,18 +175,26 @@ document.addEventListener('DOMContentLoaded', function() {
             sendButton.classList.remove('sending');
         });
     }
-    
-    // Process text to identify and format code blocks
+
     function processCodeBlocks(text) {
-        // Simple regex to detect code blocks (between ``` or with language specifier)
+        // Enhanced code block detection with language support
         const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n```/g;
-        
         return text.replace(codeBlockRegex, (match, language, code) => {
-            return `<div class="code-block">${code.trim()}<button class="copy-button" data-code="${escapeHtml(code.trim())}">Copy</button></div>`;
+            const langClass = language ? `language-${language}` : '';
+            return `
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-language">${language || 'code'}</span>
+                        <button class="copy-button" data-code="${escapeHtml(code.trim())}">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <pre><code class="${langClass}">${escapeHtml(code.trim())}</code></pre>
+                </div>
+            `;
         });
     }
-    
-    // Helper function to escape HTML
+
     function escapeHtml(unsafe) {
         return unsafe
             .replace(/&/g, "&amp;")
@@ -219,35 +203,27 @@ document.addEventListener('DOMContentLoaded', function() {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
-    
-    // Add copy buttons to all code blocks in the chat
+
     function addCodeCopyButtons() {
-        document.querySelectorAll('.code-block').forEach(codeBlock => {
-            const copyButton = codeBlock.querySelector('.copy-button');
-            if (copyButton) {
-                copyButton.addEventListener('click', function() {
-                    const code = this.getAttribute('data-code');
-                    navigator.clipboard.writeText(code).then(() => {
-                        showToast('Kode berhasil disalin!');
-                    }).catch(err => {
-                        console.error('Failed to copy text: ', err);
-                        showToast('Gagal menyalin kode');
-                    });
+        document.querySelectorAll('.code-block .copy-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const code = this.getAttribute('data-code');
+                navigator.clipboard.writeText(code).then(() => {
+                    showToast('Kode berhasil disalin!');
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    showToast('Gagal menyalin kode');
                 });
-            }
+            });
         });
     }
-    
+
     function callImageAPI(messageText) {
         const endpoint = currentModel === 'waifu-diff'
             ? `https://api.ryzumi.vip/api/ai/waifu-diff?prompt=${encodeURIComponent(messageText)}`
             : `https://api.ryzumi.vip/api/ai/flux-diffusion?prompt=${encodeURIComponent(messageText + ", anime style")}`;
         
-        fetch(endpoint, {
-            headers: {
-                'accept': 'image/png'
-            }
-        })
+        fetch(endpoint, { headers: { 'accept': 'image/png' } })
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
             return response.blob();
@@ -270,13 +246,13 @@ document.addEventListener('DOMContentLoaded', function() {
             sendButton.classList.remove('sending');
         });
     }
-    
+
     function addMessage(text, sender) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', `${sender}-message`);
         
         const messageText = document.createElement('div');
-        messageText.innerHTML = text; // Changed to innerHTML to render code blocks
+        messageText.innerHTML = text;
         
         const messageTime = document.createElement('div');
         messageTime.classList.add('message-time');
@@ -284,11 +260,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         messageElement.appendChild(messageText);
         messageElement.appendChild(messageTime);
-        
         chatContainer.appendChild(messageElement);
         scrollToBottom();
     }
-    
+
     function addImageMessage(imageUrl, sender) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', `${sender}-message`);
@@ -305,11 +280,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         messageElement.appendChild(imageElement);
         messageElement.appendChild(messageTime);
-        
         chatContainer.appendChild(messageElement);
         scrollToBottom();
     }
-    
+
     function showTypingIndicator() {
         const typingElement = document.createElement('div');
         typingElement.classList.add('typing-indicator');
@@ -324,14 +298,12 @@ document.addEventListener('DOMContentLoaded', function() {
         chatContainer.appendChild(typingElement);
         scrollToBottom();
     }
-    
+
     function removeTypingIndicator() {
         const typingIndicator = document.getElementById('typingIndicator');
-        if (typingIndicator) {
-            typingIndicator.remove();
-        }
+        if (typingIndicator) typingIndicator.remove();
     }
-    
+
     function scrollToBottom() {
         setTimeout(() => {
             chatContainer.scrollTo({
@@ -340,27 +312,34 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }, 50);
     }
-    
+
     function getCurrentTime() {
-        const now = new Date();
-        return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
-    
+
     function generateSessionId() {
-        return Math.floor(Math.random() * 1000000).toString();
+        const id = Math.floor(Math.random() * 1000000).toString();
+        localStorage.setItem('rylac_session_id', id);
+        return id;
     }
-    
+
     function generateChatId() {
-        return Date.now().toString();
+        const id = Date.now().toString();
+        localStorage.setItem('rylac_current_chat_id', id);
+        return id;
     }
-    
+
     function saveChat() {
         const chatHTML = chatContainer.innerHTML;
         
         const chatIndex = chatHistory.findIndex(chat => chat.id === currentChatId);
         if (chatIndex !== -1) {
-            chatHistory[chatIndex].messages = chatHTML;
-            chatHistory[chatIndex].lastUpdated = new Date().toISOString();
+            chatHistory[chatIndex] = {
+                ...chatHistory[chatIndex],
+                messages: chatHTML,
+                lastUpdated: new Date().toISOString(),
+                model: currentModel
+            };
         } else {
             chatHistory.push({
                 id: currentChatId,
@@ -374,14 +353,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         localStorage.setItem('rylac_chat_history', JSON.stringify(chatHistory));
     }
-    
+
     function getChatTitle(chatHTML) {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = chatHTML;
         const firstMessage = tempDiv.querySelector('.user-message');
-        return firstMessage ? firstMessage.textContent.trim().substring(0, 30) + (firstMessage.textContent.trim().length > 30 ? '...' : '') : 'Percakapan Baru';
+        return firstMessage ? firstMessage.textContent.trim().substring(0, 30) + 
+            (firstMessage.textContent.trim().length > 30 ? '...' : '') : 'Percakapan Baru';
     }
-    
+
     function startNewChat() {
         saveChat();
         currentChatId = generateChatId();
@@ -389,24 +369,21 @@ document.addEventListener('DOMContentLoaded', function() {
         chatContainer.innerHTML = '<div class="empty-state">Mulai percakapan baru dengan RyLac AI</div>';
         sidebar.classList.remove('open');
     }
-    
+
     function showChatHistory() {
         const historyHTML = `
             <div style="padding: 16px;">
                 <h3 style="margin-bottom: 16px;">Riwayat Percakapan</h3>
                 ${chatHistory.map(chat => `
-                    <div style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer;" 
-                         onclick="loadChat('${chat.id}')">
-                        <div style="font-weight: 500;">${chat.title}</div>
-                        <div style="font-size: 12px; color: var(--subtext-color); margin-top: 4px;">
-                            ${new Date(chat.lastUpdated).toLocaleString()}
-                        </div>
-                        <div style="font-size: 12px; color: var(--subtext-color);">
+                    <div class="history-item" onclick="loadChat('${chat.id}')">
+                        <div class="history-title">${chat.title}</div>
+                        <div class="history-time">${new Date(chat.lastUpdated).toLocaleString()}</div>
+                        <div class="history-model">
                             <i class="fas ${getModelIcon(chat.model)}"></i> ${getModelName(chat.model)}
                         </div>
                     </div>
-                `).join('')}
-                ${chatHistory.length === 0 ? '<p style="color: var(--subtext-color);">Tidak ada riwayat percakapan</p>' : ''}
+                `).reverse().join('')}
+                ${chatHistory.length === 0 ? '<p class="no-history">Tidak ada riwayat percakapan</p>' : ''}
             </div>
         `;
         
@@ -414,13 +391,15 @@ document.addEventListener('DOMContentLoaded', function() {
         sidebar.classList.remove('open');
         chatContainer.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    
+
     function loadChat(chatId) {
         const chat = chatHistory.find(c => c.id === chatId);
         if (chat) {
             currentChatId = chatId;
+            localStorage.setItem('rylac_current_chat_id', chatId);
             chatContainer.innerHTML = chat.messages;
             currentModel = chat.model || 'deepseek';
+            localStorage.setItem('rylac_current_model', currentModel);
             updateModelDisplay();
             setTimeout(() => {
                 addCodeCopyButtons();
@@ -428,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 100);
         }
     }
-    
+
     function getModelIcon(model) {
         switch(model) {
             case 'deepseek': return 'fa-robot';
@@ -438,7 +417,7 @@ document.addEventListener('DOMContentLoaded', function() {
             default: return 'fa-robot';
         }
     }
-    
+
     function getModelName(model) {
         switch(model) {
             case 'deepseek': return 'DeepSeek';
@@ -448,68 +427,48 @@ document.addEventListener('DOMContentLoaded', function() {
             default: return 'DeepSeek';
         }
     }
-    
+
     function setupTextareaAutoResize() {
         messageInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = (this.scrollHeight) + 'px';
         });
     }
-    
+
     function adjustTextareaHeight() {
         messageInput.style.height = 'auto';
     }
-    
+
     function playSound(audioElement) {
         audioElement.currentTime = 0;
         audioElement.play().catch(e => console.log("Audio play failed:", e));
     }
-    
+
     function toggleSidebar() {
         sidebar.classList.toggle('open');
     }
-    
+
     function toggleModelSelector() {
         modelSelector.classList.toggle('show');
     }
-    
+
     function updateModelDisplay() {
-        let modelName = '';
-        let iconClass = '';
-        
-        switch(currentModel) {
-            case 'deepseek':
-                modelName = 'DeepSeek';
-                iconClass = 'fa-robot';
-                break;
-            case 'chatgpt':
-                modelName = 'ChatGPT';
-                iconClass = 'fa-brain';
-                break;
-            case 'waifu-diff':
-                modelName = 'Waifu Diffusion';
-                iconClass = 'fa-image';
-                break;
-            case 'flux-diffusion':
-                modelName = 'Flux Diffusion';
-                iconClass = 'fa-paint-brush';
-                break;
-        }
-        
-        currentModelDisplay.innerHTML = `<i class="fas ${iconClass}"></i> ${modelName}`;
+        currentModelDisplay.innerHTML = `
+            <i class="fas ${getModelIcon(currentModel)}"></i> ${getModelName(currentModel)}
+        `;
     }
-    
+
     function toggleWallpaper() {
         document.body.classList.toggle('no-wallpaper', !this.checked);
         localStorage.setItem('rylac_wallpaper_enabled', this.checked);
     }
-    
+
     function updateWallpaperOpacity() {
         const opacity = this.value / 100;
         document.documentElement.style.setProperty('--wallpaper-opacity', opacity);
         localStorage.setItem('rylac_wallpaper_opacity', opacity);
     }
-    
+
     function loadWallpaperSettings() {
         const wallpaperEnabled = localStorage.getItem('rylac_wallpaper_enabled');
         if (wallpaperEnabled !== null) {
@@ -524,12 +483,12 @@ document.addEventListener('DOMContentLoaded', function() {
             document.documentElement.style.setProperty('--wallpaper-opacity', wallpaperOpacity);
         }
     }
-    
+
     document.addEventListener('click', function(e) {
         if (!e.target.closest('#modelSelector') && !e.target.closest('#modelButton')) {
             modelSelector.classList.remove('show');
         }
     });
-    
+
     window.loadChat = loadChat;
 });
