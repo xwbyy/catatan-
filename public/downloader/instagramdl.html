@@ -27,20 +27,6 @@
       --ios-card-bg: rgba(255, 255, 255, 0.7);
     }
     
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --primary-color: #0A84FF;
-        --secondary-color: #30D158;
-        --danger-color: #FF453A;
-        --dark-color: #1C1C1E;
-        --light-color: #2C2C2E;
-        --text-primary: #FFFFFF;
-        --text-secondary: #8E8E93;
-        --ios-blur: rgba(44, 44, 46, 0.8);
-        --ios-card-bg: rgba(28, 28, 30, 0.7);
-      }
-    }
-    
     * {
       margin: 0;
       padding: 0;
@@ -340,57 +326,27 @@
       }
     }
     
-    /* iOS-like switch */
-    .switch-container {
+    /* Language switcher */
+    .language-switcher {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+    
+    .language-btn {
+      background-color: var(--ios-card-bg);
+      border: none;
+      border-radius: 12px;
+      padding: 8px 15px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-bottom: 15px;
-    }
-    
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 30px;
-    }
-    
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 34px;
-    }
-    
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 26px;
-      width: 26px;
-      left: 2px;
-      bottom: 2px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    
-    input:checked + .slider {
-      background-color: var(--primary-color);
-    }
-    
-    input:checked + .slider:before {
-      transform: translateX(20px);
+      gap: 5px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
     
     /* Tooltip */
@@ -424,16 +380,30 @@
 </head>
 <body>
   <div class="container">
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+      <button class="language-btn" id="language-btn">
+        <i class="fas fa-globe"></i>
+        <span id="current-language">ID</span>
+      </button>
+    </div>
+    
     <header class="header">
       <img src="https://files.catbox.moe/zj48ha.jpg" alt="Instagram Downloader Logo" class="logo">
-      <h1>Instagram Downloader Pro</h1>
-      <p class="subtitle">Download video, foto, dan reel Instagram dengan kualitas HD</p>
+      <h1 id="main-title">Instagram Downloader Pro</h1>
+      <p class="subtitle" id="main-subtitle">Download video, foto, dan reel Instagram dengan kualitas HD</p>
     </header>
     
     <div class="tabs">
-      <div class="tab active" data-tab="download">Download</div>
-      <div class="tab" data-tab="guide">Panduan</div>
-      <div class="tab" data-tab="about">Tentang</div>
+      <div class="tab active" data-tab="download">
+        <span id="tab-download">Download</span>
+      </div>
+      <div class="tab" data-tab="guide">
+        <span id="tab-guide">Panduan</span>
+      </div>
+      <div class="tab" data-tab="about">
+        <span id="tab-about">Tentang</span>
+      </div>
     </div>
     
     <div class="tab-content active" id="download-tab">
@@ -441,16 +411,8 @@
         <div class="input-group">
           <input type="url" id="url" placeholder="Tempel link Instagram di sini..." autocomplete="off">
           <button class="btn-primary" id="download-btn">
-            <i class="fas fa-download"></i> Download
+            <i class="fas fa-download"></i> <span id="download-text">Download</span>
           </button>
-        </div>
-        
-        <div class="switch-container">
-          <span>Mode Gelap</span>
-          <label class="switch">
-            <input type="checkbox" id="dark-mode-toggle">
-            <span class="slider"></span>
-          </label>
         </div>
       </div>
       
@@ -458,7 +420,7 @@
       
       <div class="loading" id="loading">
         <div class="spinner"></div>
-        <p>Memproses permintaan Anda...</p>
+        <p id="loading-text">Memproses permintaan Anda...</p>
       </div>
       
       <div class="results" id="results"></div>
@@ -466,8 +428,8 @@
     
     <div class="tab-content" id="guide-tab">
       <div class="search-box">
-        <h2><i class="fas fa-book"></i> Panduan Penggunaan</h2>
-        <ol style="padding-left: 20px; margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+        <h2><i class="fas fa-book"></i> <span id="guide-title">Panduan Penggunaan</span></h2>
+        <ol id="guide-steps" style="padding-left: 20px; margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
           <li>Salin link Instagram yang ingin Anda download (postingan, reel, IGTV, atau story)</li>
           <li>Tempel link tersebut ke dalam kolom input di atas</li>
           <li>Klik tombol "Download"</li>
@@ -475,8 +437,8 @@
           <li>Klik tombol "Download" pada media yang ingin disimpan</li>
         </ol>
         
-        <h3 style="margin-top: 20px;"><i class="fas fa-lightbulb"></i> Tips</h3>
-        <ul style="padding-left: 20px; margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+        <h3 style="margin-top: 20px;"><i class="fas fa-lightbulb"></i> <span id="tips-title">Tips</span></h3>
+        <ul id="tips-list" style="padding-left: 20px; margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
           <li>Pastikan link yang Anda tempel adalah link publik (bukan dari akun private)</li>
           <li>Untuk story, pastikan Anda menyalin link sebelum story tersebut hilang</li>
           <li>Jika mengalami error, coba refresh halaman dan ulangi proses</li>
@@ -486,35 +448,124 @@
     
     <div class="tab-content" id="about-tab">
       <div class="search-box">
-        <h2><i class="fas fa-info-circle"></i> Tentang Aplikasi</h2>
-        <p style="margin-top: 15px; line-height: 1.6;">
+        <h2><i class="fas fa-info-circle"></i> <span id="about-title">Tentang Aplikasi</span></h2>
+        <p id="about-description" style="margin-top: 15px; line-height: 1.6;">
           Instagram Downloader Pro adalah alat online yang memungkinkan Anda untuk mendownload konten Instagram dengan mudah dan cepat. 
           Aplikasi ini mendukung berbagai jenis konten termasuk foto, video, reel, IGTV, dan story.
         </p>
         
-        <h3 style="margin-top: 20px;"><i class="fas fa-code"></i> Teknologi</h3>
-        <p style="margin-top: 10px; line-height: 1.6;">
+        <h3 style="margin-top: 20px;"><i class="fas fa-code"></i> <span id="tech-title">Teknologi</span></h3>
+        <p id="tech-description" style="margin-top: 10px; line-height: 1.6;">
           Dibangun dengan HTML5, CSS3, dan JavaScript modern. Menggunakan API pihak ketiga yang handal untuk mendapatkan konten dengan kualitas terbaik.
         </p>
         
-        <h3 style="margin-top: 20px;"><i class="fas fa-shield-alt"></i> Privasi & Keamanan</h3>
-        <p style="margin-top: 10px; line-height: 1.6;">
+        <h3 style="margin-top: 20px;"><i class="fas fa-shield-alt"></i> <span id="privacy-title">Privasi & Keamanan</span></h3>
+        <p id="privacy-description" style="margin-top: 10px; line-height: 1.6;">
           Kami tidak menyimpan data pribadi Anda atau konten yang Anda download. Semua proses dilakukan di perangkat Anda.
         </p>
       </div>
     </div>
     
     <footer class="footer">
-      <p>&copy; 2023 RyLac Team. All rights reserved.</p>
+      <p id="copyright">&copy; 2023 RyLac Team. All rights reserved.</p>
       <p style="margin-top: 5px;">
-        <a href="#" style="color: var(--primary-color); text-decoration: none;">Ketentuan Layanan</a> | 
-        <a href="#" style="color: var(--primary-color); text-decoration: none;">Kebijakan Privasi</a>
+        <a href="#" style="color: var(--primary-color); text-decoration: none;" id="terms-link">Ketentuan Layanan</a> | 
+        <a href="#" style="color: var(--primary-color); text-decoration: none;" id="privacy-link">Kebijakan Privasi</a>
       </p>
     </footer>
   </div>
 
   <script>
+    // Language translations
+    const translations = {
+      en: {
+        mainTitle: "Instagram Downloader Pro",
+        mainSubtitle: "Download Instagram videos, photos, and reels in HD quality",
+        tabDownload: "Download",
+        tabGuide: "Guide",
+        tabAbout: "About",
+        urlPlaceholder: "Paste Instagram link here...",
+        downloadText: "Download",
+        loadingText: "Processing your request...",
+        errorInvalidUrl: "Invalid Instagram URL. Please make sure the URL is from Instagram",
+        errorEmptyUrl: "Please enter an Instagram URL first",
+        errorNoMedia: "No media found at this URL",
+        errorGeneral: "An error occurred while processing your request",
+        guideTitle: "User Guide",
+        guideSteps: [
+          "Copy the Instagram link you want to download (post, reel, IGTV, or story)",
+          "Paste the link into the input field above",
+          "Click the \"Download\" button",
+          "Wait for the process to complete",
+          "Click the \"Download\" button on the media you want to save"
+        ],
+        tipsTitle: "Tips",
+        tipsList: [
+          "Make sure the link you paste is public (not from a private account)",
+          "For stories, make sure you copy the link before the story disappears",
+          "If you encounter an error, try refreshing the page and repeating the process"
+        ],
+        aboutTitle: "About the App",
+        aboutDescription: "Instagram Downloader Pro is an online tool that allows you to download Instagram content easily and quickly. This application supports various types of content including photos, videos, reels, IGTV, and stories.",
+        techTitle: "Technology",
+        techDescription: "Built with modern HTML5, CSS3, and JavaScript. Uses reliable third-party APIs to get content with the best quality.",
+        privacyTitle: "Privacy & Security",
+        privacyDescription: "We do not store your personal data or the content you download. All processes are done on your device.",
+        copyright: "© 2023 RyLac Team. All rights reserved.",
+        termsLink: "Terms of Service",
+        privacyLink: "Privacy Policy"
+      },
+      id: {
+        mainTitle: "Instagram Downloader Pro",
+        mainSubtitle: "Download video, foto, dan reel Instagram dengan kualitas HD",
+        tabDownload: "Download",
+        tabGuide: "Panduan",
+        tabAbout: "Tentang",
+        urlPlaceholder: "Tempel link Instagram di sini...",
+        downloadText: "Download",
+        loadingText: "Memproses permintaan Anda...",
+        errorInvalidUrl: "URL Instagram tidak valid. Pastikan URL berasal dari Instagram",
+        errorEmptyUrl: "Masukkan URL Instagram terlebih dahulu",
+        errorNoMedia: "Tidak ada media yang ditemukan di URL tersebut",
+        errorGeneral: "Terjadi kesalahan saat memproses permintaan Anda",
+        guideTitle: "Panduan Penggunaan",
+        guideSteps: [
+          "Salin link Instagram yang ingin Anda download (postingan, reel, IGTV, atau story)",
+          "Tempel link tersebut ke dalam kolom input di atas",
+          "Klik tombol \"Download\"",
+          "Tunggu hingga proses selesai",
+          "Klik tombol \"Download\" pada media yang ingin disimpan"
+        ],
+        tipsTitle: "Tips",
+        tipsList: [
+          "Pastikan link yang Anda tempel adalah link publik (bukan dari akun private)",
+          "Untuk story, pastikan Anda menyalin link sebelum story tersebut hilang",
+          "Jika mengalami error, coba refresh halaman dan ulangi proses"
+        ],
+        aboutTitle: "Tentang Aplikasi",
+        aboutDescription: "Instagram Downloader Pro adalah alat online yang memungkinkan Anda untuk mendownload konten Instagram dengan mudah dan cepat. Aplikasi ini mendukung berbagai jenis konten termasuk foto, video, reel, IGTV, dan story.",
+        techTitle: "Teknologi",
+        techDescription: "Dibangun dengan HTML5, CSS3, dan JavaScript modern. Menggunakan API pihak ketiga yang handal untuk mendapatkan konten dengan kualitas terbaik.",
+        privacyTitle: "Privasi & Keamanan",
+        privacyDescription: "Kami tidak menyimpan data pribadi Anda atau konten yang Anda download. Semua proses dilakukan di perangkat Anda.",
+        copyright: "© 2023 RyLac Team. All rights reserved.",
+        termsLink: "Ketentuan Layanan",
+        privacyLink: "Kebijakan Privasi"
+      }
+    };
+
+    // Current language
+    let currentLanguage = 'id';
+
     document.addEventListener('DOMContentLoaded', function() {
+      // Initialize language
+      const savedLanguage = localStorage.getItem('language') || 'id';
+      setLanguage(savedLanguage);
+      
+      // Language switcher
+      const languageBtn = document.getElementById('language-btn');
+      languageBtn.addEventListener('click', toggleLanguage);
+      
       // Tab functionality
       const tabs = document.querySelectorAll('.tab');
       tabs.forEach(tab => {
@@ -528,27 +579,6 @@
           const tabId = tab.getAttribute('data-tab');
           document.getElementById(`${tabId}-tab`).classList.add('active');
         });
-      });
-      
-      // Dark mode toggle
-      const darkModeToggle = document.getElementById('dark-mode-toggle');
-      const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
-      
-      // Check for saved user preference or use system preference
-      const currentTheme = localStorage.getItem('theme');
-      if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
-        document.body.classList.add('dark-theme');
-        darkModeToggle.checked = true;
-      }
-      
-      darkModeToggle.addEventListener('change', function() {
-        if (this.checked) {
-          document.body.classList.add('dark-theme');
-          localStorage.setItem('theme', 'dark');
-        } else {
-          document.body.classList.remove('dark-theme');
-          localStorage.setItem('theme', 'light');
-        }
       });
       
       // Download functionality
@@ -570,12 +600,12 @@
         
         // Validate URL
         if (!url) {
-          showError('Masukkan URL Instagram terlebih dahulu');
+          showError(translations[currentLanguage].errorEmptyUrl);
           return;
         }
         
         if (!isValidInstagramUrl(url)) {
-          showError('URL Instagram tidak valid. Pastikan URL berasal dari Instagram');
+          showError(translations[currentLanguage].errorInvalidUrl);
           return;
         }
         
@@ -614,10 +644,10 @@
           }
           
           // If both APIs fail
-          showError('Tidak dapat mengambil konten. Coba lagi nanti atau gunakan link yang berbeda.');
+          showError(translations[currentLanguage].errorGeneral);
         } catch (error) {
           console.error('Error:', error);
-          showError('Terjadi kesalahan saat memproses permintaan Anda');
+          showError(translations[currentLanguage].errorGeneral);
         } finally {
           loading.style.display = 'none';
         }
@@ -638,7 +668,7 @@
         results.innerHTML = '';
         
         if (!mediaItems || mediaItems.length === 0) {
-          showError('Tidak ada media yang ditemukan di URL tersebut');
+          showError(translations[currentLanguage].errorNoMedia);
           return;
         }
         
@@ -687,7 +717,9 @@
             icon.style.marginBottom = '15px';
             
             const text = document.createElement('p');
-            text.textContent = 'Klik tombol download di bawah untuk menyimpan file';
+            text.textContent = currentLanguage === 'id' 
+              ? 'Klik tombol download di bawah untuk menyimpan file' 
+              : 'Click the download button below to save the file';
             
             unknownType.appendChild(icon);
             unknownType.appendChild(text);
@@ -713,7 +745,7 @@
           downloadLink.className = 'download-btn';
           downloadLink.href = item.url;
           downloadLink.download = '';
-          downloadLink.textContent = 'Download';
+          downloadLink.textContent = translations[currentLanguage].downloadText;
           downloadLink.target = '_blank';
           
           meta.appendChild(typeBadge);
@@ -729,6 +761,58 @@
         });
       }
     });
+    
+    function toggleLanguage() {
+      const newLanguage = currentLanguage === 'id' ? 'en' : 'id';
+      setLanguage(newLanguage);
+      localStorage.setItem('language', newLanguage);
+    }
+    
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      document.getElementById('current-language').textContent = lang.toUpperCase();
+      
+      // Update all text elements
+      const translation = translations[lang];
+      
+      document.getElementById('main-title').textContent = translation.mainTitle;
+      document.getElementById('main-subtitle').textContent = translation.mainSubtitle;
+      document.getElementById('tab-download').textContent = translation.tabDownload;
+      document.getElementById('tab-guide').textContent = translation.tabGuide;
+      document.getElementById('tab-about').textContent = translation.tabAbout;
+      document.getElementById('url').placeholder = translation.urlPlaceholder;
+      document.getElementById('download-text').textContent = translation.downloadText;
+      document.getElementById('loading-text').textContent = translation.loadingText;
+      document.getElementById('guide-title').textContent = translation.guideTitle;
+      document.getElementById('tips-title').textContent = translation.tipsTitle;
+      document.getElementById('about-title').textContent = translation.aboutTitle;
+      document.getElementById('about-description').textContent = translation.aboutDescription;
+      document.getElementById('tech-title').textContent = translation.techTitle;
+      document.getElementById('tech-description').textContent = translation.techDescription;
+      document.getElementById('privacy-title').textContent = translation.privacyTitle;
+      document.getElementById('privacy-description').textContent = translation.privacyDescription;
+      document.getElementById('copyright').textContent = translation.copyright;
+      document.getElementById('terms-link').textContent = translation.termsLink;
+      document.getElementById('privacy-link').textContent = translation.privacyLink;
+      
+      // Update guide steps
+      const guideSteps = document.getElementById('guide-steps');
+      guideSteps.innerHTML = '';
+      translation.guideSteps.forEach(step => {
+        const li = document.createElement('li');
+        li.textContent = step;
+        guideSteps.appendChild(li);
+      });
+      
+      // Update tips list
+      const tipsList = document.getElementById('tips-list');
+      tipsList.innerHTML = '';
+      translation.tipsList.forEach(tip => {
+        const li = document.createElement('li');
+        li.textContent = tip;
+        tipsList.appendChild(li);
+      });
+    }
   </script>
 </body>
 </html>
