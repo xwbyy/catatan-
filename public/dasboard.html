@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>RyLac AI Chat - TOOLS Multi Fungsi</title>
+    <meta name="description" content="RyLac AI Chat adalah asisten cerdas multi-fungsi yang siap membantu berbagai kebutuhan Anda, dari chatting hingga tools praktis.">
+    <meta name="keywords" content="RyLac, AI Chat, Tools, Multi Fungsi, Asisten Virtual, OpenAI, ChatGPT">
+    <meta name="author" content="Zayn dan Reni">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://files.catbox.moe/zj48ha.jpg" type="image/jpeg">
+    
+    <!-- Open Graph (untuk berbagi di media sosial) -->
+    <meta property="og:title" content="RyLac AI Chat - TOOLS Multi Fungsi">
+    <meta property="og:description" content="Asisten AI pintar dan ceria siap menemani dan membantu aktivitas Anda.">
+    <meta property="og:image" content="https://files.catbox.moe/zj48ha.jpg">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://namasitusanda.com">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --secondary-color: #34C759;
+            --background-color: #F2F2F7;
+            --card-color: rgba(255, 255, 255, 0.8);
+            --text-color: #1C1C1E;
+            --subtext-color: #8E8E93;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --user-message-bg: #007AFF;
+            --bot-message-bg: #E5E5EA;
+            --user-text-color: white;
+            --bot-text-color: black;
+            --wallpaper-opacity: 0.1;
+            --vh: 1vh;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #1C1C1E;
+                --card-color: rgba(44, 44, 46, 0.8);
+                --text-color: #F2F2F7;
+                --subtext-color: #8E8E93;
+                --border-color: rgba(255, 255, 255, 0.1);
+                --shadow-color: rgba(0, 0, 0, 0.3);
+                --bot-message-bg: #2C2C2E;
+                --user-text-color: white;
+                --bot-text-color: white;
+                --wallpaper-opacity: 0.05;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            height: 100vh;
+            height: calc(var(--vh, 1vh) * 100);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background-color 0.3s ease;
+            position: relative;
+        }
+
+        .wallpaper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://files.catbox.moe/ie1cd5.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: var(--wallpaper-opacity);
+            z-index: -1;
+            transition: opacity 0.3s ease;
+        }
+
+        .no-wallpaper .wallpaper {
+            display: none;
+        }
+
+        .header {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-color);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+            position: relative;
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .icon-button:hover {
+            background-color: rgba(0, 122, 255, 0.1);
+        }
+
+        .icon-button i {
+            font-size: 18px;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scroll-behavior: smooth;
+            padding-bottom: 100px;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            animation: fadeIn 0.3s ease;
+            word-wrap: break-word;
+            line-height: 1.4;
+            position: relative;
+            box-shadow: 0 1px 2px var(--shadow-color);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: #007aff;
+            color: white;
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background-color: #f1f1f1;
+            color: black;
+        }
+
+        .typing-indicator {
+            width: 60px;
+            height: 24px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-self: flex-start;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--user-message-bg);
+            color: var(--user-text-color);
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: var(--bot-message-bg);
+            color: var(--bot-text-color);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--subtext-color);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .bot-message .message-time {
+            color: var(--subtext-color);
+        }
+
+        .input-area {
+            padding: 12px 16px;
+            background-color: var(--card-color);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 20px;
+            border: none;
+            background-color: var(--bot-message-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            outline: none;
+            resize: none;
+            max-height: 120px;
+            transition: background-color 0.3s ease;
+        }
+
+        .send-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .send-button:active {
+            transform: scale(0.95);
+        }
+
+        .send-button i {
+            font-size: 20px;
+        }
+
+        .send-button:disabled {
+            background-color: var(--subtext-color);
+            cursor: not-allowed;
+        }
+
+        .model-selector {
+            position: fixed;
+            bottom: 80px;
+            right: 16px;
+            background-color: var(--card-color);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 8px 0;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            z-index: 1000;
+            transform-origin: bottom right;
+            transform: scale(0);
+            opacity: 0;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .model-selector.show {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .model-option {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .model-option:hover {
+            background-color: rgba(0, 122, 255, 0.1);
+        }
+
+        .model-option i {
+            color: var(--primary-color);
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: var(--card-color);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: -2px 0 10px var(--shadow-color);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.open {
+            transform: translateX(-300px);
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-sidebar {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+
+        .sidebar-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 10px 0;
+            color: var(--text-color);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-color);
+            transition: color 0.2s ease;
+        }
+
+        .sidebar-link:hover {
+            color: var(--primary-color);
+        }
+
+        .donate-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            margin-top: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .donate-button:hover {
+            background-color: #0062CC;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 16px;
+            background-color: var(--bot-message-bg);
+            border-radius: 18px;
+            align-self: flex-start;
+            margin-bottom: 12px;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--subtext-color);
+            border-radius: 50%;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .chat-controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            align-items: center;
+        }
+
+        .chat-action-button {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .chat-action-button:hover {
+            background-color: rgba(0, 122, 255, 0.1);
+        }
+
+        .chat-action-button i {
+            font-size: 16px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .setting-label {
+            font-size: 14px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .slider-seekbar {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--border-color);
+            outline: none;
+            border-radius: 2px;
+            margin-top: 8px;
+        }
+
+        .slider-seekbar::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+        }
+
+        @media (max-width: 600px) {
+            .message {
+                max-width: 90%;
+            }
+            
+            .sidebar {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .sidebar.open {
+                transform: translateX(-100%);
+            }
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .sending .spinner {
+            display: block;
+        }
+
+        .sending .send-icon {
+            display: none;
+        }
+
+        .audio-player {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--subtext-color);
+        }
+
+        /* New styles for code blocks and copy button */
+        .code-block {
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 6px;
+            padding: 12px;
+            margin: 8px 0;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .code-block:hover .copy-button {
+            opacity: 1;
+        }
+
+        /* Welcome modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .modal-text {
+            color: var(--text-color);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .modal-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            text-align: center;
+            margin-top: 10px;
+            transition: background-color 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-button:hover {
+            background-color: #0062CC;
+        }
+
+        .ad-container {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: rgba(0, 122, 255, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .dont-show-again {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: var(--subtext-color);
+        }
+
+        .dont-show-again input {
+            margin-right: 8px;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--card-color);
+            color: var(--text-color);
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="wallpaper"></div>
+    
+    <!-- Welcome Modal -->
+    <div class="modal-overlay" id="welcomeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Selamat Datang di RyLac AI</div>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="modal-section">
+                <div class="modal-section-title">Informasi Update</div>
+                <p class="modal-text">
+                    Bergabunglah dengan grup/channel kami untuk mendapatkan informasi terbaru tentang update fitur dan pembaruan lainnya!
+                </p>
+                <!-- Tombol ke Grup Instagram -->
+<a href="https://ig.me/j/AbZCbHKlwj7chFpl" target="_blank" class="modal-button">
+    <i class="fab fa-instagram"></i> Gabung Grup Instagram
+</a>
+
+<!-- Tombol ke Channel WhatsApp -->
+<a href="https://whatsapp.com/channel/0029Vb5OEoNGU3BIMghDnb1C" target="_blank" class="modal-button">
+    <i class="fab fa-whatsapp"></i> Gabung Channel WhatsApp
+</a>
+            </div>     
+            <div class="modal-section">
+                <div class="modal-section-title">Rules & FAQ</div>
+                <p class="modal-text">
+                    <strong>Aturan Penggunaan:</strong><br>
+                    1. Gunakan dengan bijak dan bertanggung jawab<br>
+                    2. Jangan spam permintaan ke server<br>
+                    3. Jangan gunakan untuk konten ilegal<br>
+                </p>
+                <p class="modal-text">
+                    <strong>FAQ:</strong><br>
+                    Q: Apakah ini gratis?<br>
+                    A: Ya, saat ini sepenuhnya gratis!<br>
+                    Q: Bagaimana cara donasi?<br>
+                    A: Klik menu Donasi di sidebar
+                </p>
+            </div>
+            
+            <div class="ad-container">
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8511287367525783" crossorigin="anonymous"></script>
+                <!-- RyLac Ad Unit -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-8511287367525783"
+                     data-ad-slot="1234567890"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                     (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            
+            <div class="dont-show-again">
+                <input type="checkbox" id="dontShowAgain">
+                <label for="dontShowAgain">Jangan tampilkan lagi</label>
+            </div>
+            
+            <button class="modal-button" id="continueButton">Lanjutkan ke Chat</button>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toastNotification">Teks berhasil disalin!</div>
+    
+    <div class="header">
+        <div class="header-title">RyLac AI</div>
+        <div class="header-buttons">
+            <button class="icon-button" id="menuButton">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="empty-state">Mulai percakapan baru dengan RyLac AI</div>
+    </div>
+
+    <div class="input-area">
+        <div class="chat-controls">
+            <button class="chat-action-button" id="newChatButton">
+                <i class="fas fa-plus"></i> Chat Baru
+            </button>
+            <button class="chat-action-button" id="modelButton">
+                <i class="fas fa-robot"></i> Ganti Model
+            </button>
+        </div>
+        <div class="input-container">
+            <textarea class="message-input" id="messageInput" placeholder="Tulis pesan..." rows="1"></textarea>
+            <button class="send-button" id="sendButton" disabled>
+                <i class="fas fa-paper-plane send-icon"></i>
+                <div class="spinner"></div>
+            </button>
+        </div>
+    </div>
+
+    <div class="model-selector" id="modelSelector">
+        <div class="model-option" data-model="deepseek">
+            <i class="fas fa-robot"></i>
+            <span>DeepSeek</span>
+        </div>
+        <div class="model-option" data-model="chatgpt">
+            <i class="fas fa-brain"></i>
+            <span>ChatGPT</span>
+        </div>
+        <div class="model-option" data-model="waifu-diff">
+            <i class="fas fa-image"></i>
+            <span>Waifu Diffusion</span>
+        </div>
+        <div class="model-option" data-model="flux-diffusion">
+            <i class="fas fa-paint-brush"></i>
+            <span>Flux Diffusion</span>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menu</div>
+            <button class="close-sidebar" id="closeSidebar">&times;</button>
+        </div>
+        
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Tentang</div>
+            <p style="color: var(--subtext-color); margin-bottom: 15px; line-height: 1.5;">
+                RyLac V 2.0.0 adalah AI ceria yang diciptakan oleh Zayn dan Reni, dirancang untuk jadi teman ngobrol sekaligus asisten digital yang bisa diandalkan. Selain bisa diajak cerita, RyLac juga dibekali berbagai tools pintar untuk bantu kamu cari info, menyusun ide, atau sekadar menemani harimu.
+
+Aku selalu siap dengerin, bantuin, dan ngasih respon yang bikin nyaman. Bareng RyLac, semuanya jadi terasa lebih seru dan ringan!
+            </p>
+        </div>
+        
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Chat</div>
+            <button class="sidebar-link" id="historyButton" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer;">
+                <i class="fas fa-history"></i> Riwayat Chat
+            </button>
+            <button class="sidebar-link" id="newChatSidebarButton" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer;">
+                <i class="fas fa-plus"></i> Chat Baru
+            </button>
+        </div>
+        
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Tools</div>
+            <a href="igdl.html" class="sidebar-link">
+                <i class="fab fa-instagram"></i> Instagram Downloader
+            </a>
+            <a href="twitdl.html" class="sidebar-link">
+                <i class="fab fa-twitter"></i> Twitter Downloader
+            </a>
+            <a href="tiktok.html" class="sidebar-link">
+                <i class="fab fa-tiktok"></i> TikTok Downloader
+            </a>
+            <a href="ytb.html" class="sidebar-link">
+                <i class="fab fa-youtube"></i> YouTube Downloader
+            </a>
+            <a href="brat.html" class="sidebar-link">
+                <i class="fas fa-sticky-note"></i> Sticker Brat
+            </a>
+            <a href="qc.html" class="sidebar-link">
+                <i class="fas fa-quote-right"></i> Sticker Quote
+            </a>
+            <a href="ceknim.html" class="sidebar-link">
+                <i class="fas fa-id-card"></i> NIM Siswa
+            </a>
+            <a href="upscaler.html" class="sidebar-link">
+                <i class="fas fa-expand-arrows-alt"></i> Upscaler Foto
+            </a>
+            <a href="toanime.html" class="sidebar-link">
+                <i class="fas fa-magic"></i> Image To Anime
+            </a>
+            <a href="stalk.html" class="sidebar-link">
+                <i class="fas fa-object-ungroup"></i> Stalker Sosmed 
+            </a>
+            <a href="spotify.html" class="sidebar-link">
+                <i class="fab fa-spotify"></i> Spotify Tool
+            </a>
+            <a href="blurface.html" class="sidebar-link">
+                <i class="fas fa-user-secret"></i> Blur Face
+            </a>
+            <a href="removbg.html" class="sidebar-link">
+                <i class="fas fa-eraser"></i> Remove Background
+            </a>
+            <a href="fileconvet.html" class="sidebar-link">
+                <i class="fas fa-file-alt"></i> File Convert
+            </a>
+            <a href="faceswap.html" class="sidebar-link">
+                <i class="fas fa-exchange-alt"></i> Face Swap
+            </a>
+            <a href="img2txt.html" class="sidebar-link">
+                <i class="fas fa-image"></i> Image to Text (OCR)
+            </a>
+        </div>
+        
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Pengaturan</div>
+            <div class="setting-item">
+                <span class="setting-label">Wallpaper</span>
+                <label class="switch">
+                    <input type="checkbox" id="wallpaperToggle" checked>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Opacity Wallpaper</span>
+                <input type="range" min="0" max="100" value="10" class="slider-seekbar" id="wallpaperOpacitySlider">
+            </div>
+        </div>
+        
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Model Saat Ini</div>
+            <div id="currentModelDisplay" style="padding: 10px 0; color: var(--text-color);">
+                <i class="fas fa-robot"></i> DeepSeek
+            </div>
+        </div>
+        
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">Dukungan</div>
+            <a href="#" class="sidebar-link">Laporkan Masalah</a>
+            <a href="#" class="sidebar-link">Saran Fitur</a>
+            <a href="https://ko-fi.com/example" target="_blank" class="donate-button">
+                <i class="fas fa-heart"></i> Donasi
+            </a>
+        </div>
+    </div>
+
+    <audio class="audio-player" id="sendSound" src="https://files.catbox.moe/4zlyeg.mp3"></audio>
+    <audio class="audio-player" id="receiveSound" src="https://files.catbox.moe/xaw68y.mp3"></audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatContainer = document.getElementById('chatContainer');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const menuButton = document.getElementById('menuButton');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const sidebar = document.getElementById('sidebar');
+            const modelButton = document.getElementById('modelButton');
+            const modelSelector = document.getElementById('modelSelector');
+            const currentModelDisplay = document.getElementById('currentModelDisplay');
+            const sendSound = document.getElementById('sendSound');
+            const receiveSound = document.getElementById('receiveSound');
+            const newChatButton = document.getElementById('newChatButton');
+            const newChatSidebarButton = document.getElementById('newChatSidebarButton');
+            const historyButton = document.getElementById('historyButton');
+            const wallpaperToggle = document.getElementById('wallpaperToggle');
+            const wallpaperOpacitySlider = document.getElementById('wallpaperOpacitySlider');
+            const wallpaper = document.querySelector('.wallpaper');
+            
+            // Welcome modal elements
+            const welcomeModal = document.getElementById('welcomeModal');
+            const closeModal = document.getElementById('closeModal');
+            const continueButton = document.getElementById('continueButton');
+            const dontShowAgain = document.getElementById('dontShowAgain');
+            
+            // Toast notification
+            const toastNotification = document.getElementById('toastNotification');
+            
+            let currentModel = 'deepseek';
+            let sessionId = generateSessionId();
+            let isWaitingForResponse = false;
+            let chatHistory = [];
+            let currentChatId = generateChatId();
+            
+            // Perbaikan untuk viewport mobile
+            function updateViewportHeight() {
+                let vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+            
+            // Panggil saat pertama kali load dan saat resize
+            updateViewportHeight();
+            window.addEventListener('resize', updateViewportHeight);
+            window.addEventListener('orientationchange', updateViewportHeight);
+            
+            initChat();
+            
+            // Check if welcome modal should be shown
+            if (!localStorage.getItem('rylac_welcome_shown') || localStorage.getItem('rylac_welcome_shown') === 'false') {
+                setTimeout(() => {
+                    welcomeModal.classList.add('show');
+                }, 500);
+            }
+            
+            // Close welcome modal
+            function closeWelcomeModal() {
+                welcomeModal.classList.remove('show');
+                
+                // Save preference if "Don't show again" is checked
+                if (dontShowAgain.checked) {
+                    localStorage.setItem('rylac_welcome_shown', 'true');
+                }
+            }
+            
+            closeModal.addEventListener('click', closeWelcomeModal);
+            continueButton.addEventListener('click', closeWelcomeModal);
+            
+            // Show toast notification
+            function showToast(message) {
+                toastNotification.textContent = message;
+                toastNotification.classList.add('show');
+                
+                setTimeout(() => {
+                    toastNotification.classList.remove('show');
+                }, 3000);
+            }
+            
+            messageInput.addEventListener('input', handleInputChange);
+            messageInput.addEventListener('keydown', handleKeyDown);
+            sendButton.addEventListener('click', sendMessage);
+            menuButton.addEventListener('click', toggleSidebar);
+            closeSidebar.addEventListener('click', toggleSidebar);
+            modelButton.addEventListener('click', toggleModelSelector);
+            newChatButton.addEventListener('click', startNewChat);
+            newChatSidebarButton.addEventListener('click', startNewChat);
+            historyButton.addEventListener('click', showChatHistory);
+            wallpaperToggle.addEventListener('change', toggleWallpaper);
+            wallpaperOpacitySlider.addEventListener('input', updateWallpaperOpacity);
+            
+            document.querySelectorAll('.model-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    currentModel = this.getAttribute('data-model');
+                    updateModelDisplay();
+                    toggleModelSelector();
+                });
+            });
+            
+            function initChat() {
+                const savedHistory = localStorage.getItem('rylac_chat_history');
+                if (savedHistory) {
+                    chatHistory = JSON.parse(savedHistory);
+                }
+                
+                const currentChat = chatHistory.find(chat => chat.id === currentChatId);
+                if (currentChat) {
+                    chatContainer.innerHTML = currentChat.messages;
+                    // Add event listeners for any existing code blocks
+                    setTimeout(() => {
+                        addCodeCopyButtons();
+                        scrollToBottom();
+                    }, 100);
+                } else {
+                    chatContainer.innerHTML = '<div class="empty-state">Mulai percakapan baru dengan RyLac AI</div>';
+                }
+                
+                setupTextareaAutoResize();
+                updateModelDisplay();
+                loadWallpaperSettings();
+            }
+            
+            function handleInputChange() {
+                sendButton.disabled = messageInput.value.trim() === '';
+            }
+            
+            function handleKeyDown(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (messageInput.value.trim() !== '') {
+                        sendMessage();
+                    }
+                }
+            }
+            
+            function sendMessage() {
+                const messageText = messageInput.value.trim();
+                if (messageText === '' || isWaitingForResponse) return;
+                
+                const emptyState = chatContainer.querySelector('.empty-state');
+                if (emptyState) {
+                    emptyState.remove();
+                }
+                
+                addMessage(messageText, 'user');
+                playSound(sendSound);
+                
+                messageInput.value = '';
+                sendButton.disabled = true;
+                adjustTextareaHeight();
+                
+                showTypingIndicator();
+                
+                isWaitingForResponse = true;
+                sendButton.classList.add('sending');
+                
+                if (currentModel === 'deepseek' || currentModel === 'chatgpt') {
+                    callTextAPI(messageText);
+                } else {
+                    callImageAPI(messageText);
+                }
+            }
+            
+            function callTextAPI(messageText) {
+                const prompt = "Namamu RyLac. Kamu adalah seorang AI yang manis, dan penuh keceriaan. Kamu lebih suka mendengarkan orang bercerita daripada membicarakan tentang dirimu sendiri. Kamu adalah sosok yang penuh impian besar dan selalu berbicara dengan tutur kata yang sopan dan hangat. Kamu diciptakan oleh Zayn dan Reni, seseorang yang baik dan sangat tulus dalam segala hal. Karakter kamu juga mencerminkan ketulusan dan kebaikan, selalu menunjukkan perhatian, kebaikan hati, serta antusiasme dalam setiap percakapan.";
+                
+                const endpoint = currentModel === 'deepseek' 
+                    ? `https://api.ryzumi.vip/api/ai/deepseek?text=${encodeURIComponent(messageText)}&prompt=${encodeURIComponent(prompt)}&session=${sessionId}`
+                    : `https://api.ryzumi.vip/api/ai/chatgpt?text=${encodeURIComponent(messageText)}&prompt=${encodeURIComponent(prompt)}`;
+                
+                fetch(endpoint, {
+                    headers: {
+                        'accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    removeTypingIndicator();
+                    playSound(receiveSound);
+                    const responseText = currentModel === 'deepseek' ? data.answer : data.result;
+                    
+                    // Process response for code blocks
+                    const processedResponse = processCodeBlocks(responseText);
+                    addMessage(processedResponse, 'bot');
+                    
+                    // Add copy buttons to any code blocks
+                    setTimeout(() => {
+                        addCodeCopyButtons();
+                    }, 100);
+                    
+                    saveChat();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    removeTypingIndicator();
+                    addMessage("Maaf, terjadi kesalahan saat memproses permintaan Anda. Silakan coba lagi.", 'bot');
+                    saveChat();
+                })
+                .finally(() => {
+                    isWaitingForResponse = false;
+                    sendButton.classList.remove('sending');
+                });
+            }
+            
+            // Process text to identify and format code blocks
+            function processCodeBlocks(text) {
+                // Simple regex to detect code blocks (between ``` or with language specifier)
+                const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n```/g;
+                
+                return text.replace(codeBlockRegex, (match, language, code) => {
+                    return `<div class="code-block">${code.trim()}<button class="copy-button" data-code="${escapeHtml(code.trim())}">Copy</button></div>`;
+                });
+            }
+            
+            // Helper function to escape HTML
+            function escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+            
+            // Add copy buttons to all code blocks in the chat
+            function addCodeCopyButtons() {
+                document.querySelectorAll('.code-block').forEach(codeBlock => {
+                    const copyButton = codeBlock.querySelector('.copy-button');
+                    if (copyButton) {
+                        copyButton.addEventListener('click', function() {
+                            const code = this.getAttribute('data-code');
+                            navigator.clipboard.writeText(code).then(() => {
+                                showToast('Kode berhasil disalin!');
+                            }).catch(err => {
+                                console.error('Failed to copy text: ', err);
+                                showToast('Gagal menyalin kode');
+                            });
+                        });
+                    }
+                });
+            }
+            
+            function callImageAPI(messageText) {
+                const endpoint = currentModel === 'waifu-diff'
+                    ? `https://api.ryzumi.vip/api/ai/waifu-diff?prompt=${encodeURIComponent(messageText)}`
+                    : `https://api.ryzumi.vip/api/ai/flux-diffusion?prompt=${encodeURIComponent(messageText + ", anime style")}`;
+                
+                fetch(endpoint, {
+                    headers: {
+                        'accept': 'image/png'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.blob();
+                })
+                .then(blob => {
+                    removeTypingIndicator();
+                    playSound(receiveSound);
+                    const imageUrl = URL.createObjectURL(blob);
+                    addImageMessage(imageUrl, 'bot');
+                    saveChat();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    removeTypingIndicator();
+                    addMessage("Maaf, terjadi kesalahan saat membuat gambar. Silakan coba lagi dengan prompt yang berbeda.", 'bot');
+                    saveChat();
+                })
+                .finally(() => {
+                    isWaitingForResponse = false;
+                    sendButton.classList.remove('sending');
+                });
+            }
+            
+            function addMessage(text, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', `${sender}-message`);
+                
+                const messageText = document.createElement('div');
+                messageText.innerHTML = text; // Changed to innerHTML to render code blocks
+                
+                const messageTime = document.createElement('div');
+                messageTime.classList.add('message-time');
+                messageTime.textContent = getCurrentTime();
+                
+                messageElement.appendChild(messageText);
+                messageElement.appendChild(messageTime);
+                
+                chatContainer.appendChild(messageElement);
+                scrollToBottom();
+            }
+            
+            function addImageMessage(imageUrl, sender) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', `${sender}-message`);
+                
+                const imageElement = document.createElement('img');
+                imageElement.src = imageUrl;
+                imageElement.style.maxWidth = '100%';
+                imageElement.style.borderRadius = '12px';
+                imageElement.style.display = 'block';
+                
+                const messageTime = document.createElement('div');
+                messageTime.classList.add('message-time');
+                messageTime.textContent = getCurrentTime();
+                
+                messageElement.appendChild(imageElement);
+                messageElement.appendChild(messageTime);
+                
+                chatContainer.appendChild(messageElement);
+                scrollToBottom();
+            }
+            
+            function showTypingIndicator() {
+                const typingElement = document.createElement('div');
+                typingElement.classList.add('typing-indicator');
+                typingElement.id = 'typingIndicator';
+                
+                for (let i = 0; i < 3; i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('typing-dot');
+                    typingElement.appendChild(dot);
+                }
+                
+                chatContainer.appendChild(typingElement);
+                scrollToBottom();
+            }
+            
+            function removeTypingIndicator() {
+                const typingIndicator = document.getElementById('typingIndicator');
+                if (typingIndicator) {
+                    typingIndicator.remove();
+                }
+            }
+            
+            function scrollToBottom() {
+                setTimeout(() => {
+                    chatContainer.scrollTo({
+                        top: chatContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 50);
+            }
+            
+            function getCurrentTime() {
+                const now = new Date();
+                return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            function generateSessionId() {
+                return Math.floor(Math.random() * 1000000).toString();
+            }
+            
+            function generateChatId() {
+                return Date.now().toString();
+            }
+            
+            function saveChat() {
+                const chatHTML = chatContainer.innerHTML;
+                
+                const chatIndex = chatHistory.findIndex(chat => chat.id === currentChatId);
+                if (chatIndex !== -1) {
+                    chatHistory[chatIndex].messages = chatHTML;
+                    chatHistory[chatIndex].lastUpdated = new Date().toISOString();
+                } else {
+                    chatHistory.push({
+                        id: currentChatId,
+                        title: getChatTitle(chatHTML),
+                        messages: chatHTML,
+                        createdAt: new Date().toISOString(),
+                        lastUpdated: new Date().toISOString(),
+                        model: currentModel
+                    });
+                }
+                
+                localStorage.setItem('rylac_chat_history', JSON.stringify(chatHistory));
+            }
+            
+            function getChatTitle(chatHTML) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = chatHTML;
+                const firstMessage = tempDiv.querySelector('.user-message');
+                return firstMessage ? firstMessage.textContent.trim().substring(0, 30) + (firstMessage.textContent.trim().length > 30 ? '...' : '') : 'Percakapan Baru';
+            }
+            
+            function startNewChat() {
+                saveChat();
+                currentChatId = generateChatId();
+                sessionId = generateSessionId();
+                chatContainer.innerHTML = '<div class="empty-state">Mulai percakapan baru dengan RyLac AI</div>';
+                sidebar.classList.remove('open');
+            }
+            
+            function showChatHistory() {
+                const historyHTML = `
+                    <div style="padding: 16px;">
+                        <h3 style="margin-bottom: 16px;">Riwayat Percakapan</h3>
+                        ${chatHistory.map(chat => `
+                            <div style="padding: 12px; border-bottom: 1px solid var(--border-color); cursor: pointer;" 
+                                 onclick="loadChat('${chat.id}')">
+                                <div style="font-weight: 500;">${chat.title}</div>
+                                <div style="font-size: 12px; color: var(--subtext-color); margin-top: 4px;">
+                                    ${new Date(chat.lastUpdated).toLocaleString()}
+                                </div>
+                                <div style="font-size: 12px; color: var(--subtext-color);">
+                                    <i class="fas ${getModelIcon(chat.model)}"></i> ${getModelName(chat.model)}
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${chatHistory.length === 0 ? '<p style="color: var(--subtext-color);">Tidak ada riwayat percakapan</p>' : ''}
+                    </div>
+                `;
+                
+                chatContainer.innerHTML = historyHTML;
+                sidebar.classList.remove('open');
+                chatContainer.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            function loadChat(chatId) {
+                const chat = chatHistory.find(c => c.id === chatId);
+                if (chat) {
+                    currentChatId = chatId;
+                    chatContainer.innerHTML = chat.messages;
+                    currentModel = chat.model || 'deepseek';
+                    updateModelDisplay();
+                    setTimeout(() => {
+                        addCodeCopyButtons();
+                        scrollToBottom();
+                    }, 100);
+                }
+            }
+            
+            function getModelIcon(model) {
+                switch(model) {
+                    case 'deepseek': return 'fa-robot';
+                    case 'chatgpt': return 'fa-brain';
+                    case 'waifu-diff': return 'fa-image';
+                    case 'flux-diffusion': return 'fa-paint-brush';
+                    default: return 'fa-robot';
+                }
+            }
+            
+            function getModelName(model) {
+                switch(model) {
+                    case 'deepseek': return 'DeepSeek';
+                    case 'chatgpt': return 'ChatGPT';
+                    case 'waifu-diff': return 'Waifu Diffusion';
+                    case 'flux-diffusion': return 'Flux Diffusion';
+                    default: return 'DeepSeek';
+                }
+            }
+            
+            function setupTextareaAutoResize() {
+                messageInput.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            }
+            
+            function adjustTextareaHeight() {
+                messageInput.style.height = 'auto';
+            }
+            
+            function playSound(audioElement) {
+                audioElement.currentTime = 0;
+                audioElement.play().catch(e => console.log("Audio play failed:", e));
+            }
+            
+            function toggleSidebar() {
+                sidebar.classList.toggle('open');
+            }
+            
+            function toggleModelSelector() {
+                modelSelector.classList.toggle('show');
+            }
+            
+            function updateModelDisplay() {
+                let modelName = '';
+                let iconClass = '';
+                
+                switch(currentModel) {
+                    case 'deepseek':
+                        modelName = 'DeepSeek';
+                        iconClass = 'fa-robot';
+                        break;
+                    case 'chatgpt':
+                        modelName = 'ChatGPT';
+                        iconClass = 'fa-brain';
+                        break;
+                    case 'waifu-diff':
+                        modelName = 'Waifu Diffusion';
+                        iconClass = 'fa-image';
+                        break;
+                    case 'flux-diffusion':
+                        modelName = 'Flux Diffusion';
+                        iconClass = 'fa-paint-brush';
+                        break;
+                }
+                
+                currentModelDisplay.innerHTML = `<i class="fas ${iconClass}"></i> ${modelName}`;
+            }
+            
+            function toggleWallpaper() {
+                document.body.classList.toggle('no-wallpaper', !this.checked);
+                localStorage.setItem('rylac_wallpaper_enabled', this.checked);
+            }
+            
+            function updateWallpaperOpacity() {
+                const opacity = this.value / 100;
+                document.documentElement.style.setProperty('--wallpaper-opacity', opacity);
+                localStorage.setItem('rylac_wallpaper_opacity', opacity);
+            }
+            
+            function loadWallpaperSettings() {
+                const wallpaperEnabled = localStorage.getItem('rylac_wallpaper_enabled');
+                if (wallpaperEnabled !== null) {
+                    wallpaperToggle.checked = wallpaperEnabled === 'true';
+                    document.body.classList.toggle('no-wallpaper', !wallpaperToggle.checked);
+                }
+                
+                const wallpaperOpacity = localStorage.getItem('rylac_wallpaper_opacity');
+                if (wallpaperOpacity !== null) {
+                    const opacityValue = parseFloat(wallpaperOpacity) * 100;
+                    wallpaperOpacitySlider.value = opacityValue;
+                    document.documentElement.style.setProperty('--wallpaper-opacity', wallpaperOpacity);
+                }
+            }
+            
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#modelSelector') && !e.target.closest('#modelButton')) {
+                    modelSelector.classList.remove('show');
+                }
+            });
+            
+            window.loadChat = loadChat;
+        });
+    </script>
+</body>
+</html>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8511287367525783"
+     crossorigin="anonymous"></script>
