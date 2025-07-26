@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Code Generator</title>
+  <meta name="description" content="Generate QR codes from text">
+  <meta name="keywords" content="QR Code, Generator, iOS Style">
+  <meta name="author" content="RyLac Team">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary-color: #007AFF;
+      --secondary-color: #34C759;
+      --danger-color: #FF3B30;
+      --dark-color: #1C1C1E;
+      --light-color: #F2F2F7;
+      --text-primary: #000000;
+      --text-secondary: #8E8E93;
+      --ios-blur: rgba(242, 242, 247, 0.8);
+      --ios-card-bg: rgba(255, 255, 255, 0.7);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    body {
+      background-color: var(--light-color);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(135deg, #e0e5ec 0%, #c9d6ff 100%);
+    }
+    
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .generator-box {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      padding: 20px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    input[type="text"] {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      background-color: var(--ios-card-bg);
+      color: var(--text-primary);
+      backdrop-filter: blur(5px);
+    }
+    
+    input[type="text"]::placeholder {
+      color: var(--text-secondary);
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--primary-color);
+    }
+    
+    button {
+      padding: 0 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #0062CC;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      color: var(--danger-color);
+      text-align: center;
+      padding: 15px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .result-container {
+      text-align: center;
+      margin-bottom: 30px;
+      display: none;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .qr-code {
+      width: 200px;
+      height: 200px;
+      margin: 0 auto 20px;
+      border-radius: 12px;
+      background-color: white;
+      padding: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .qr-code img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    
+    .download-btn {
+      display: inline-block;
+      padding: 12px 25px;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+    }
+    
+    .download-btn:hover {
+      background-color: #0062CC;
+    }
+    
+    .footer {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      border-radius: 20px;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .input-group {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+    }
+    
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--dark-color);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>QR Code Generator</h1>
+      <p class="subtitle">Convert text to QR code instantly</p>
+    </header>
+    
+    <div class="generator-box">
+      <div class="input-group">
+        <input type="text" id="text-input" placeholder="Enter text or URL..." autocomplete="off">
+        <button class="btn-primary" id="generate-btn">
+          <i class="fas fa-qrcode"></i> Generate
+        </button>
+      </div>
+    </div>
+    
+    <div class="error-message" id="error-message"></div>
+    
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Generating QR Code...</p>
+    </div>
+    
+    <div class="result-container" id="result-container">
+      <div class="qr-code" id="qr-code">
+        <img id="qr-image" src="" alt="QR Code">
+      </div>
+      <a href="#" class="download-btn" id="download-btn" download="qrcode.png">
+        <i class="fas fa-download"></i> Download
+      </a>
+    </div>
+    
+    <footer class="footer">
+      <p>&copy; 2023 RyLac Team. All rights reserved.</p>
+    </footer>
+    
+    <div class="toast" id="toast">QR Code generated successfully!</div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const generateBtn = document.getElementById('generate-btn');
+      const textInput = document.getElementById('text-input');
+      const loading = document.getElementById('loading');
+      const errorMessage = document.getElementById('error-message');
+      const resultContainer = document.getElementById('result-container');
+      const qrImage = document.getElementById('qr-image');
+      const downloadBtn = document.getElementById('download-btn');
+      const toast = document.getElementById('toast');
+      
+      generateBtn.addEventListener('click', generateQRCode);
+      textInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          generateQRCode();
+        }
+      });
+      
+      async function generateQRCode() {
+        const text = textInput.value.trim();
+        
+        // Validate input
+        if (!text) {
+          showError('Please enter some text first');
+          return;
+        }
+        
+        // Clear previous results and errors
+        resultContainer.style.display = 'none';
+        errorMessage.style.display = 'none';
+        
+        // Show loading
+        loading.style.display = 'block';
+        
+        try {
+          // Encode text for URL
+          const encodedText = encodeURIComponent(text);
+          
+          // Build API URL
+          const apiUrl = `https://api.siputzx.my.id/api/tools/text2qr?text=${encodedText}`;
+          
+          // Fetch the QR code
+          const response = await fetch(apiUrl);
+          
+          if (!response.ok) {
+            throw new Error('Failed to generate QR code');
+          }
+          
+          // Get the image blob
+          const blob = await response.blob();
+          const objectUrl = URL.createObjectURL(blob);
+          
+          // Display the result
+          qrImage.src = objectUrl;
+          downloadBtn.href = objectUrl;
+          downloadBtn.download = `qrcode-${Date.now()}.png`;
+          
+          resultContainer.style.display = 'block';
+          showToast('QR Code generated successfully!');
+        } catch (error) {
+          console.error('Error:', error);
+          showError('Failed to generate QR code. Please try again.');
+        } finally {
+          loading.style.display = 'none';
+        }
+      }
+      
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        loading.style.display = 'none';
+      }
+      
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2000);
+      }
+    });
+  </script>
+</body>
+</html>
