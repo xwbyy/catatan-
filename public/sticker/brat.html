@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brat Tools Sticker Generator</title>
+  <meta name="description" content="Generate Brat Tools stickers with custom text">
+  <meta name="keywords" content="Brat Tools, Sticker Generator, Meme Creator">
+  <meta name="author" content="RyLac Team">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary-color: #FF3B30;
+      --secondary-color: #FF9500;
+      --dark-color: #1C1C1E;
+      --light-color: #F2F2F7;
+      --text-primary: #000000;
+      --text-secondary: #8E8E93;
+      --ios-blur: rgba(242, 242, 247, 0.8);
+      --ios-card-bg: rgba(255, 255, 255, 0.7);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    body {
+      background-color: var(--light-color);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 20px;
+      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 22%;
+      margin-bottom: 15px;
+      object-fit: cover;
+      border: 2px solid var(--primary-color);
+    }
+    
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .generator-box {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      padding: 20px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    input[type="text"] {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      background-color: var(--ios-card-bg);
+      color: var(--text-primary);
+      backdrop-filter: blur(5px);
+    }
+    
+    input[type="text"]::placeholder {
+      color: var(--text-secondary);
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--primary-color);
+    }
+    
+    button {
+      padding: 0 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #E0352B;
+    }
+    
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #E68600;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      color: var(--primary-color);
+      text-align: center;
+      padding: 15px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .result-container {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .sticker-result {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+    }
+    
+    .options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    
+    .option-btn {
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    
+    .option-btn.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .download-btn {
+      display: inline-block;
+      padding: 12px 25px;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+    }
+    
+    .download-btn:hover {
+      background-color: #E0352B;
+    }
+    
+    .footer {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      border-radius: 20px;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .input-group {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>Brat Tools Sticker Generator</h1>
+      <p class="subtitle">Create custom Brat Tools stickers with your text</p>
+    </header>
+    
+    <div class="generator-box">
+      <div class="input-group">
+        <input type="text" id="sticker-text" placeholder="Enter your text here..." autocomplete="off">
+        <button class="btn-primary" id="generate-btn">
+          <i class="fas fa-magic"></i> Generate
+        </button>
+      </div>
+      
+      <div class="options">
+        <div class="option-btn active" data-type="gif">
+          <i class="fas fa-film"></i> GIF
+        </div>
+        <div class="option-btn" data-type="image">
+          <i class="fas fa-image"></i> Image
+        </div>
+      </div>
+    </div>
+    
+    <div class="error-message" id="error-message"></div>
+    
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Generating your sticker...</p>
+    </div>
+    
+    <div class="result-container" id="result-container" style="display: none;">
+      <img id="sticker-result" class="sticker-result" src="" alt="Generated Sticker">
+      <a href="#" class="download-btn" id="download-btn" download="brat-tools-sticker">
+        <i class="fas fa-download"></i> Download
+      </a>
+    </div>
+    
+    <footer class="footer">
+      <p>&copy; 2023 RyLac Team. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const generateBtn = document.getElementById('generate-btn');
+      const textInput = document.getElementById('sticker-text');
+      const loading = document.getElementById('loading');
+      const errorMessage = document.getElementById('error-message');
+      const resultContainer = document.getElementById('result-container');
+      const stickerResult = document.getElementById('sticker-result');
+      const downloadBtn = document.getElementById('download-btn');
+      const optionBtns = document.querySelectorAll('.option-btn');
+      
+      let currentType = 'gif';
+      
+      // Set up option buttons
+      optionBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          optionBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          currentType = this.getAttribute('data-type');
+        });
+      });
+      
+      // Generate sticker
+      generateBtn.addEventListener('click', generateSticker);
+      textInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          generateSticker();
+        }
+      });
+      
+      async function generateSticker() {
+        const text = textInput.value.trim();
+        
+        // Validate input
+        if (!text) {
+          showError('Please enter some text first');
+          return;
+        }
+        
+        // Clear previous results and errors
+        resultContainer.style.display = 'none';
+        errorMessage.style.display = 'none';
+        
+        // Show loading
+        loading.style.display = 'block';
+        
+        try {
+          // Encode text for URL
+          const encodedText = encodeURIComponent(text);
+          
+          // Build API URL
+          const apiUrl = `https://api.siputzx.my.id/api/m/brat?text=${encodedText}&isAnimated=${currentType === 'gif'}&delay=500`;
+          
+          // Fetch the sticker
+          const response = await fetch(apiUrl);
+          
+          if (!response.ok) {
+            throw new Error('Failed to generate sticker');
+          }
+          
+          // Get the image blob
+          const blob = await response.blob();
+          const objectUrl = URL.createObjectURL(blob);
+          
+          // Display the result
+          stickerResult.src = objectUrl;
+          downloadBtn.href = objectUrl;
+          downloadBtn.download = `brat-tools-${currentType === 'gif' ? 'sticker.gif' : 'sticker.webp'}`;
+          
+          resultContainer.style.display = 'block';
+        } catch (error) {
+          console.error('Error:', error);
+          showError('Failed to generate sticker. Please try again.');
+        } finally {
+          loading.style.display = 'none';
+        }
+      }
+      
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        loading.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
