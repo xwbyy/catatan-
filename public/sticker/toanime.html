@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime Style Converter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff4d8d;
+            --primary-dark: #e63e7b;
+            --secondary: #8a2be2;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --success: #4cc9f0;
+            --error: #f72585;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        @font-face {
+            font-family: 'Poppins';
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2) format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Poppins';
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLEj6Z1xlFQ.woff2) format('woff2');
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .tagline {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            background-color: rgba(26, 26, 46, 0.7);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .upload-panel {
+            padding: 2.5rem;
+            background-color: rgba(26, 26, 46, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-panel {
+            padding: 2.5rem;
+            background-color: rgba(26, 26, 46, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--light);
+            position: relative;
+            padding-bottom: 0.75rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            background-color: rgba(255, 77, 141, 0.1);
+        }
+
+        .upload-area:hover {
+            background-color: rgba(255, 77, 141, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .upload-hint {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .style-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .style-option {
+            border: 1px solid var(--primary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            background-color: rgba(26, 26, 46, 0.7);
+        }
+
+        .style-option:hover {
+            background-color: rgba(255, 77, 141, 0.1);
+        }
+
+        .style-option.selected {
+            background-color: var(--primary);
+            color: var(--white);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .style-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.875rem 1.75rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 77, 141, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 77, 141, 0.1);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1/1;
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            position: relative;
+            background-color: rgba(26, 26, 46, 0.7);
+            border: 1px solid var(--primary);
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--gray);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1.5rem 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 77, 141, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--primary);
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .toast.success {
+            background-color: var(--primary);
+        }
+
+        .toast.error {
+            background-color: var(--error);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 1rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Anime Style Converter</div>
+            <p class="tagline">Transform your photos into stunning anime-style artwork with AI</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="upload-panel">
+                <h3 class="section-title">Upload Photo</h3>
+                
+                <div class="form-group">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">Drag & drop your photo here</div>
+                        <div class="upload-hint">or click to browse files (JPEG, PNG)</div>
+                        <input type="file" id="file-input" accept="image/jpeg, image/png">
+                    </div>
+                    
+                    <div class="progress-container" id="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    
+                    <div id="file-info" style="display: none;">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                            <img id="preview-thumbnail" src="" alt="Preview" style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.5rem;">
+                            <div>
+                                <div id="file-name" style="font-weight: 500;"></div>
+                                <div id="file-size" style="font-size: 0.8rem; color: var(--gray);"></div>
+                            </div>
+                            <button id="remove-file" style="margin-left: auto; background: none; border: none; color: var(--error); cursor: pointer;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <h3 class="section-title">Style Options</h3>
+                    <div class="style-options">
+                        <div class="style-option selected" data-style="anime">
+                            <div class="style-label">Anime</div>
+                        </div>
+                        <div class="style-option" data-style="manga">
+                            <div class="style-label">Manga</div>
+                        </div>
+                        <div class="style-option" data-style="cartoon">
+                            <div class="style-label">Cartoon</div>
+                        </div>
+                        <div class="style-option" data-style="fantasy">
+                            <div class="style-label">Fantasy</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="convert-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-magic"></i> Convert to Anime
+                    </button>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Converting your image...</p>
+                </div>
+            </div>
+            
+            <div class="preview-panel">
+                <h3 class="section-title">Anime Preview</h3>
+                
+                <div class="image-preview">
+                    <div class="placeholder" id="preview-placeholder">
+                        <div class="placeholder-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div>Your anime-style image will appear here</div>
+                    </div>
+                    <img id="anime-image" src="" alt="Anime Style Preview" style="display: none;">
+                </div>
+                
+                <div class="download-options">
+                    <button id="download-btn" class="btn btn-secondary" disabled>
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Image converted successfully!</span>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            const previewThumbnail = document.getElementById('preview-thumbnail');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+            const fileInfo = document.getElementById('file-info');
+            const removeFile = document.getElementById('remove-file');
+            const convertBtn = document.getElementById('convert-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const animeImage = document.getElementById('anime-image');
+            const previewPlaceholder = document.getElementById('preview-placeholder');
+            const loading = document.getElementById('loading');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            
+            // Style options
+            const styleOptions = document.querySelectorAll('.style-option');
+            
+            // Current selections
+            let selectedFile = null;
+            let selectedStyle = 'anime';
+            let convertedImageUrl = null;
+            
+            // Initialize
+            styleOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    styleOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedStyle = this.getAttribute('data-style');
+                });
+            });
+            
+            // Event Listeners
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    selectedFile = e.target.files[0];
+                    displayFileInfo(selectedFile);
+                    convertBtn.disabled = false;
+                }
+            });
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = 'rgba(255, 77, 141, 0.2)';
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.style.backgroundColor = 'rgba(255, 77, 141, 0.1)';
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.style.backgroundColor = 'rgba(255, 77, 141, 0.1)';
+                
+                if (e.dataTransfer.files.length > 0) {
+                    selectedFile = e.dataTransfer.files[0];
+                    displayFileInfo(selectedFile);
+                    convertBtn.disabled = false;
+                }
+            });
+            
+            removeFile.addEventListener('click', function() {
+                selectedFile = null;
+                fileInput.value = '';
+                fileInfo.style.display = 'none';
+                convertBtn.disabled = true;
+                downloadBtn.disabled = true;
+                animeImage.style.display = 'none';
+                previewPlaceholder.style.display = 'flex';
+            });
+            
+            convertBtn.addEventListener('click', convertToAnime);
+            downloadBtn.addEventListener('click', downloadImage);
+            
+            // Functions
+            function displayFileInfo(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewThumbnail.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileInfo.style.display = 'block';
+            }
+            
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            async function convertToAnime() {
+                if (!selectedFile) {
+                    showToast('Please select an image first', 'error');
+                    return;
+                }
+                
+                // Show loading
+                loading.style.display = 'block';
+                progressContainer.style.display = 'block';
+                convertBtn.disabled = true;
+                
+                try {
+                    // Step 1: Upload the image
+                    const uploadFormData = new FormData();
+                    uploadFormData.append('file', selectedFile);
+                    
+                    const uploadResponse = await fetch('https://api.ryzumi.vip/api/uploader/ryzencdn', {
+                        method: 'POST',
+                        body: uploadFormData,
+                        onUploadProgress: function(progressEvent) {
+                            if (progressEvent.lengthComputable) {
+                                const percentComplete = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                                progressBar.style.width = percentComplete + '%';
+                            }
+                        }
+                    });
+                    
+                    if (!uploadResponse.ok) {
+                        throw new Error('Failed to upload image');
+                    }
+                    
+                    const uploadResult = await uploadResponse.json();
+                    const imageUrl = uploadResult.url;
+                    
+                    // Step 2: Convert to anime style
+                    const convertUrl = `https://api.ryzumi.vip/api/ai/toanime?url=${encodeURIComponent(imageUrl)}&style=${selectedStyle}`;
+                    
+                    const convertResponse = await fetch(convertUrl);
+                    
+                    if (!convertResponse.ok) {
+                        throw new Error('Failed to convert image');
+                    }
+                    
+                    const blob = await convertResponse.blob();
+                    convertedImageUrl = URL.createObjectURL(blob);
+                    animeImage.src = convertedImageUrl;
+                    animeImage.style.display = 'block';
+                    previewPlaceholder.style.display = 'none';
+                    downloadBtn.disabled = false;
+                    
+                    showToast('Image converted to anime style!', 'success');
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Failed to convert image', 'error');
+                } finally {
+                    loading.style.display = 'none';
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                    convertBtn.disabled = false;
+                }
+            }
+            
+            function downloadImage() {
+                if (!convertedImageUrl) {
+                    showToast('No image to download', 'error');
+                    return;
+                }
+                
+                const link = document.createElement('a');
+                link.href = convertedImageUrl;
+                link.download = `anime-style-${Date.now()}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showToast('Download started!', 'success');
+            }
+            
+            function showToast(message, type = 'success') {
+                const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+                toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+                toast.className = `toast show ${type}`;
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
