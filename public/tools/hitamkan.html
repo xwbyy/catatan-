@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Blackening Converter | Professional Photo Editor</title>
+    <meta name="description" content="Transform your photos into stunning blackened artwork with our professional AI-powered converter">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #333333;
+            --primary-dark: #222222;
+            --secondary: #555555;
+            --dark: #121212;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --white: #ffffff;
+            --success: #4cc9f0;
+            --error: #f72585;
+            --warning: #f8961e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        @font-face {
+            font-family: 'Poppins';
+            font-style: normal;
+            font-weight: 400;
+            src: url(https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfecg.woff2) format('woff2');
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: 'Poppins';
+            font-style: normal;
+            font-weight: 600;
+            src: url(https://fonts.gstatic.com/s/poppins/v20/pxiByp8kv8JHgFVrLEj6Z1xlFQ.woff2) format('woff2');
+            font-display: swap;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .tagline {
+            color: var(--gray);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            background-color: rgba(18, 18, 18, 0.7);
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .upload-panel {
+            padding: 2.5rem;
+            background-color: rgba(18, 18, 18, 0.5);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-panel {
+            padding: 2.5rem;
+            background-color: rgba(18, 18, 18, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--light);
+            position: relative;
+            padding-bottom: 0.75rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            background-color: rgba(51, 51, 51, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area:hover {
+            background-color: rgba(51, 51, 51, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-area.dragover {
+            background-color: rgba(51, 51, 51, 0.3);
+            border-color: var(--success);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .upload-text {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .upload-hint {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .style-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .style-option {
+            border: 1px solid var(--primary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            background-color: rgba(18, 18, 18, 0.7);
+        }
+
+        .style-option:hover {
+            background-color: rgba(51, 51, 51, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .style-option.selected {
+            background-color: var(--primary);
+            color: var(--white);
+            box-shadow: 0 0 0 2px var(--primary);
+            border-color: transparent;
+        }
+
+        .style-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.875rem 1.75rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(51, 51, 51, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background-color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(51, 51, 51, 0.1);
+        }
+
+        .btn-secondary:disabled {
+            color: var(--gray);
+            border-color: var(--gray);
+            cursor: not-allowed;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-width: 400px;
+            aspect-ratio: 1/1;
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            position: relative;
+            background-color: rgba(18, 18, 18, 0.7);
+            border: 1px solid var(--primary);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: var(--dark);
+        }
+
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--gray);
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .placeholder-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1.5rem 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(51, 51, 51, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 0.875rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid var(--primary);
+            max-width: 90%;
+            width: max-content;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success {
+            background-color: var(--primary);
+            border-color: var(--primary-dark);
+        }
+
+        .toast.error {
+            background-color: var(--error);
+            border-color: #d90452;
+        }
+
+        .toast.warning {
+            background-color: var(--warning);
+            border-color: #e07e00;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            margin-top: 1rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        #file-info {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .file-info-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background-color: rgba(51, 51, 51, 0.2);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .file-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        #remove-file {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--error);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        #remove-file:hover {
+            background-color: rgba(247, 37, 133, 0.1);
+        }
+
+        .download-options {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .download-quality {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .quality-option {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background-color: rgba(51, 51, 51, 0.2);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .quality-option.selected {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary-dark);
+        }
+
+        .quality-option:hover:not(.selected) {
+            background-color: rgba(51, 51, 51, 0.3);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .upload-panel, .preview-panel {
+                padding: 1.5rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .btn-group, .download-options {
+                flex-direction: column;
+            }
+            
+            .style-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">Image Blackening Converter</div>
+            <p class="tagline">Transform your photos into professional blackened artwork with advanced AI processing</p>
+        </header>
+        
+        <div class="app-container">
+            <div class="upload-panel">
+                <h3 class="section-title">Upload Photo</h3>
+                
+                <div class="form-group">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">Drag & drop your photo here</div>
+                        <div class="upload-hint">or click to browse files (JPEG, PNG, WEBP)</div>
+                        <input type="file" id="file-input" accept="image/jpeg, image/png, image/webp">
+                    </div>
+                    
+                    <div class="progress-container" id="progress-container">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    
+                    <div id="file-info">
+                        <div class="file-info-container">
+                            <img id="preview-thumbnail" src="" alt="Preview" style="width: 50px; height: 50px; object-fit: cover; border-radius: 0.5rem;">
+                            <div class="file-details">
+                                <div class="file-name" id="file-name"></div>
+                                <div class="file-size" id="file-size"></div>
+                            </div>
+                            <button id="remove-file" title="Remove file">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <h3 class="section-title">Blackening Style</h3>
+                    <div class="style-options">
+                        <div class="style-option selected" data-filter="hitam">
+                            <div class="style-label">Dark Black</div>
+                            <div class="style-description" style="font-size: 0.75rem; color: var(--gray); margin-top: 0.25rem;">Deep, rich black tones</div>
+                        </div>
+                        <div class="style-option" data-filter="shadow">
+                            <div class="style-label">Shadow Effect</div>
+                            <div class="style-description" style="font-size: 0.75rem; color: var(--gray); margin-top: 0.25rem;">Dramatic shadow contrast</div>
+                        </div>
+                        <div class="style-option" data-filter="noir">
+                            <div class="style-label">Noir Style</div>
+                            <div class="style-description" style="font-size: 0.75rem; color: var(--gray); margin-top: 0.25rem;">Classic film noir look</div>
+                        </div>
+                        <div class="style-option" data-filter="silhouette">
+                            <div class="style-label">Silhouette</div>
+                            <div class="style-description" style="font-size: 0.75rem; color: var(--gray); margin-top: 0.25rem;">Stark black and white</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="convert-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-magic"></i> Convert Image
+                    </button>
+                    <button id="reset-btn" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Processing your image...</p>
+                    <p class="upload-hint" id="status-text">This may take a few moments</p>
+                </div>
+            </div>
+            
+            <div class="preview-panel">
+                <h3 class="section-title">Blackened Preview</h3>
+                
+                <div class="image-preview">
+                    <div class="placeholder" id="preview-placeholder">
+                        <div class="placeholder-icon">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div>Your blackened image will appear here</div>
+                    </div>
+                    <img id="processed-image" src="" alt="Processed Preview" style="display: none;">
+                </div>
+                
+                <div class="download-options">
+                    <button id="download-btn" class="btn btn-primary" disabled>
+                        <i class="fas fa-download"></i> Download Image
+                    </button>
+                </div>
+                
+                <div class="download-quality" id="quality-options" style="display: none;">
+                    <div class="quality-option selected" data-quality="original">Original</div>
+                    <div class="quality-option" data-quality="high">High</div>
+                    <div class="quality-option" data-quality="medium">Medium</div>
+                    <div class="quality-option" data-quality="low">Low</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Image Blackening Converter. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Image processed successfully!</span>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            const previewThumbnail = document.getElementById('preview-thumbnail');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+            const fileInfo = document.getElementById('file-info');
+            const removeFile = document.getElementById('remove-file');
+            const convertBtn = document.getElementById('convert-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const processedImage = document.getElementById('processed-image');
+            const previewPlaceholder = document.getElementById('preview-placeholder');
+            const loading = document.getElementById('loading');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const statusText = document.getElementById('status-text');
+            const qualityOptions = document.getElementById('quality-options');
+            
+            // Style options
+            const styleOptions = document.querySelectorAll('.style-option');
+            const qualityOptionElements = document.querySelectorAll('.quality-option');
+            
+            // Current selections
+            let selectedFile = null;
+            let selectedFilter = 'hitam';
+            let selectedQuality = 'original';
+            let processedImageUrl = null;
+            let processedImageBlob = null;
+            
+            // Initialize
+            function init() {
+                fileInfo.style.display = 'none';
+                convertBtn.disabled = true;
+                downloadBtn.disabled = true;
+                processedImage.style.display = 'none';
+                previewPlaceholder.style.display = 'flex';
+                qualityOptions.style.display = 'none';
+            }
+            
+            init();
+            
+            // Style options selection
+            styleOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    styleOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedFilter = this.getAttribute('data-filter');
+                });
+            });
+            
+            // Quality options selection
+            qualityOptionElements.forEach(option => {
+                option.addEventListener('click', function() {
+                    qualityOptionElements.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedQuality = this.getAttribute('data-quality');
+                });
+            });
+            
+            // Event Listeners
+            uploadArea.addEventListener('click', () => fileInput.click());
+            
+            fileInput.addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleFileSelection(e.target.files[0]);
+                }
+            });
+            
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    handleFileSelection(e.dataTransfer.files[0]);
+                }
+            });
+            
+            removeFile.addEventListener('click', resetFileSelection);
+            
+            resetBtn.addEventListener('click', function() {
+                resetFileSelection();
+                showToast('All settings have been reset', 'warning');
+            });
+            
+            convertBtn.addEventListener('click', processImage);
+            downloadBtn.addEventListener('click', downloadImage);
+            
+            // Functions
+            function handleFileSelection(file) {
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    showToast('Please select a valid image file (JPEG, PNG, WEBP)', 'error');
+                    return;
+                }
+                
+                // Validate file size (max 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    showToast('File size too large (max 10MB)', 'error');
+                    return;
+                }
+                
+                selectedFile = file;
+                displayFileInfo(file);
+                convertBtn.disabled = false;
+            }
+            
+            function displayFileInfo(file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewThumbnail.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                
+                fileName.textContent = file.name.length > 30 ? file.name.substring(0, 27) + '...' : file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                fileInfo.style.display = 'block';
+            }
+            
+            function resetFileSelection() {
+                selectedFile = null;
+                fileInput.value = '';
+                fileInfo.style.display = 'none';
+                convertBtn.disabled = true;
+                downloadBtn.disabled = true;
+                processedImage.style.display = 'none';
+                previewPlaceholder.style.display = 'flex';
+                qualityOptions.style.display = 'none';
+                
+                // Clean up object URLs to prevent memory leaks
+                if (processedImageUrl) {
+                    URL.revokeObjectURL(processedImageUrl);
+                    processedImageUrl = null;
+                }
+                processedImageBlob = null;
+            }
+            
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            async function processImage() {
+                if (!selectedFile) {
+                    showToast('Please select an image first', 'error');
+                    return;
+                }
+                
+                // Show loading
+                loading.style.display = 'block';
+                progressContainer.style.display = 'block';
+                convertBtn.disabled = true;
+                statusText.textContent = 'Uploading image...';
+                
+                try {
+                    // Simulate progress for better UX
+                    simulateProgress(20);
+                    
+                    // Step 1: Upload the image
+                    const uploadFormData = new FormData();
+                    uploadFormData.append('file', selectedFile);
+                    
+                    statusText.textContent = 'Processing image...';
+                    simulateProgress(50);
+                    
+                    const uploadResponse = await fetch('https://api.ryzumi.vip/api/uploader/ryzencdn', {
+                        method: 'POST',
+                        body: uploadFormData,
+                    });
+                    
+                    if (!uploadResponse.ok) {
+                        throw new Error('Failed to upload image');
+                    }
+                    
+                    const uploadResult = await uploadResponse.json();
+                    const imageUrl = uploadResult.url;
+                    
+                    statusText.textContent = 'Applying blackening effect...';
+                    simulateProgress(80);
+                    
+                    // Step 2: Process with blackening filter
+                    const processUrl = `https://api.ryzumi.vip/api/ai/negro?url=${encodeURIComponent(imageUrl)}&filter=${selectedFilter}`;
+                    
+                    const processResponse = await fetch(processUrl);
+                    
+                    if (!processResponse.ok) {
+                        throw new Error('Failed to process image');
+                    }
+                    
+                    processedImageBlob = await processResponse.blob();
+                    
+                    // Create object URL for display
+                    if (processedImageUrl) {
+                        URL.revokeObjectURL(processedImageUrl);
+                    }
+                    processedImageUrl = URL.createObjectURL(processedImageBlob);
+                    
+                    processedImage.src = processedImageUrl;
+                    processedImage.style.display = 'block';
+                    previewPlaceholder.style.display = 'none';
+                    downloadBtn.disabled = false;
+                    qualityOptions.style.display = 'flex';
+                    
+                    simulateProgress(100);
+                    showToast('Image processed successfully!', 'success');
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Failed to process image. Please try again.', 'error');
+                } finally {
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        progressContainer.style.display = 'none';
+                        progressBar.style.width = '0%';
+                        convertBtn.disabled = false;
+                    }, 500);
+                }
+            }
+            
+            function simulateProgress(targetPercent) {
+                let currentPercent = parseInt(progressBar.style.width) || 0;
+                const increment = 1;
+                
+                const interval = setInterval(() => {
+                    if (currentPercent >= targetPercent) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    
+                    currentPercent += increment;
+                    progressBar.style.width = currentPercent + '%';
+                }, 20);
+            }
+            
+            function downloadImage() {
+                if (!processedImageBlob) {
+                    showToast('No image to download', 'error');
+                    return;
+                }
+                
+                try {
+                    // Create a new blob with potentially reduced quality
+                    let downloadBlob = processedImageBlob;
+                    
+                    if (selectedQuality !== 'original') {
+                        // In a real implementation, you would process the image here to reduce quality
+                        // This is just a placeholder for the concept
+                        console.log(`Downloading with ${selectedQuality} quality`);
+                    }
+                    
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(downloadBlob);
+                    
+                    // Generate a filename with timestamp and filter type
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    const originalName = selectedFile.name.split('.')[0];
+                    const extension = processedImageBlob.type.split('/')[1] || 'png';
+                    link.download = `${originalName}_${selectedFilter}_${timestamp}.${extension}`;
+                    
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    // Clean up the object URL after download
+                    setTimeout(() => {
+                        URL.revokeObjectURL(link.href);
+                    }, 100);
+                    
+                    showToast('Download started!', 'success');
+                } catch (error) {
+                    console.error('Download error:', error);
+                    showToast('Failed to download image', 'error');
+                }
+            }
+            
+            function showToast(message, type = 'success') {
+                const icon = type === 'success' ? 'fa-check-circle' 
+                              : type === 'error' ? 'fa-exclamation-circle' 
+                              : 'fa-info-circle';
+                
+                toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+                toast.className = `toast show ${type}`;
+                
+                // Clear any existing timeout
+                if (toast.timeoutId) {
+                    clearTimeout(toast.timeoutId);
+                }
+                
+                toast.timeoutId = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
