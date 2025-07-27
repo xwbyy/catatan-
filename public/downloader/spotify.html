@@ -858,7 +858,7 @@
                 
                 // Encode the URL for the API
                 const encodedUrl = encodeURIComponent(url);
-                const apiUrl = `https://api.ryzumi.vip/api/downloader/spotify?url=${encodedUrl}`;
+                const apiUrl = `https://api.siputzx.my.id/api/d/spotify?url=${encodedUrl}`;
                 
                 fetch(apiUrl)
                     .then(response => {
@@ -868,14 +868,29 @@
                         return response.json();
                     })
                     .then(data => {
-                        if (data.success && data.metadata && data.link) {
-                            trackData = data;
-                            displaySpotifyData(data);
+                        if (data.status && data.data) {
+                            // Format the data to match our expected structure
+                            const formattedData = {
+                                success: data.status,
+                                link: data.data.download,
+                                metadata: {
+                                    title: data.data.title,
+                                    artists: data.data.artis,
+                                    album: data.data.title, // Using title as album since API doesn't provide separate album name
+                                    duration_ms: data.data.durasi,
+                                    cover: data.data.image,
+                                    releaseDate: 'N/A', // API doesn't provide release date
+                                    url: url // Original URL
+                                }
+                            };
+                            
+                            trackData = formattedData;
+                            displaySpotifyData(formattedData);
                             showSuccess('Spotify track loaded successfully!');
                             
                             // Set audio source if available
-                            if (data.link) {
-                                audioPlayer.src = data.link;
+                            if (formattedData.link) {
+                                audioPlayer.src = formattedData.link;
                                 audioPlayerContainer.style.display = 'block';
                             }
                         } else {
