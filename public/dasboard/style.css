@@ -714,6 +714,10 @@ pre {
     background-color: rgba(0, 122, 255, 0.1);
     border-radius: 8px;
     text-align: center;
+    min-height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .dont-show-again {

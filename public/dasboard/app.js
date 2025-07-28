@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const toastNotification = document.getElementById('toastNotification');
 
     // State variables
-    let currentModel = localStorage.getItem('rylac_current_model') || 'deepseek';
+    let currentModel = localStorage.getItem('rylac_current_model') || 'gpt3';
     let sessionId = localStorage.getItem('rylac_session_id') || generateSessionId();
     let isWaitingForResponse = false;
     let chatHistory = JSON.parse(localStorage.getItem('rylac_chat_history')) || [];
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         isWaitingForResponse = true;
         sendButton.classList.add('sending');
 
-        if (currentModel === 'deepseek' || currentModel === 'chatgpt') {
+        if (currentModel === 'gpt3') {
             callTextAPI(messageText);
         } else {
             callImageAPI(messageText);
@@ -147,18 +147,19 @@ document.addEventListener('DOMContentLoaded', function() {
     function callTextAPI(messageText) {
         const prompt = "Namamu RyLac. Kamu adalah seorang AI yang manis, dan penuh keceriaan. Kamu lebih suka mendengarkan orang bercerita daripada membicarakan tentang dirimu sendiri. Kamu adalah sosok yang penuh impian besar dan selalu berbicara dengan tutur kata yang sopan dan hangat. Kamu diciptakan oleh Zayn dan Reni, seseorang yang baik dan sangat tulus dalam segala hal. Karakter kamu juga mencerminkan ketulusan dan kebaikan, selalu menunjukkan perhatian, kebaikan hati, serta antusiasme dalam setiap percakapan.";
         
-        const endpoint = currentModel === 'deepseek' 
-            ? `https://api.ryzumi.vip/api/ai/deepseek?text=${encodeURIComponent(messageText)}&prompt=${encodeURIComponent(prompt)}&session=${sessionId}`
-            : `https://api.ryzumi.vip/api/ai/chatgpt?text=${encodeURIComponent(messageText)}&prompt=${encodeURIComponent(prompt)}`;
+        const endpoint = `https://api.siputzx.my.id/api/ai/gpt3?prompt=${encodeURIComponent(prompt)}&content=${encodeURIComponent(messageText)}`;
         
         fetch(endpoint, {
-            headers: { 'accept': 'application/json' }
+            headers: { 'accept': '*/*' }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
         .then(data => {
             removeTypingIndicator();
             playSound(receiveSound);
-            const responseText = currentModel === 'deepseek' ? data.answer : data.result;
+            const responseText = data.data || data.result || "Maaf, saya tidak bisa memproses permintaan Anda saat ini.";
             const processedResponse = processCodeBlocks(responseText);
             addMessage(processedResponse, 'bot');
             setTimeout(() => addCodeCopyButtons(), 100);
@@ -177,7 +178,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function processCodeBlocks(text) {
-        // Enhanced code block detection with language support
         const codeBlockRegex = /```(\w*)\n([\s\S]*?)\n```/g;
         return text.replace(codeBlockRegex, (match, language, code) => {
             const langClass = language ? `language-${language}` : '';
@@ -398,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
             currentChatId = chatId;
             localStorage.setItem('rylac_current_chat_id', chatId);
             chatContainer.innerHTML = chat.messages;
-            currentModel = chat.model || 'deepseek';
+            currentModel = chat.model || 'gpt3';
             localStorage.setItem('rylac_current_model', currentModel);
             updateModelDisplay();
             setTimeout(() => {
@@ -410,21 +410,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getModelIcon(model) {
         switch(model) {
-            case 'deepseek': return 'fa-robot';
-            case 'chatgpt': return 'fa-brain';
+            case 'gpt3': return 'fa-brain';
             case 'waifu-diff': return 'fa-image';
             case 'flux-diffusion': return 'fa-paint-brush';
-            default: return 'fa-robot';
+            default: return 'fa-brain';
         }
     }
 
     function getModelName(model) {
         switch(model) {
-            case 'deepseek': return 'DeepSeek';
-            case 'chatgpt': return 'ChatGPT';
+            case 'gpt3': return 'GPT-3';
             case 'waifu-diff': return 'Waifu Diffusion';
             case 'flux-diffusion': return 'Flux Diffusion';
-            default: return 'DeepSeek';
+            default: return 'GPT-3';
         }
     }
 
