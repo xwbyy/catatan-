@@ -1,3 +1,4 @@
+// app.js
 document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
     const chatContainer = document.getElementById('chatContainer');
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const continueButton = document.getElementById('continueButton');
     const dontShowAgain = document.getElementById('dontShowAgain');
     const toastNotification = document.getElementById('toastNotification');
+    const toolsSection = document.getElementById('toolsSection');
 
     // State variables
     let currentModel = localStorage.getItem('rylac_current_model') || 'gpt3';
@@ -31,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize the chat
     initChat();
+    renderTools();
 
     // Viewport adjustment for mobile
     function updateViewportHeight() {
@@ -40,6 +43,17 @@ document.addEventListener('DOMContentLoaded', function() {
     updateViewportHeight();
     window.addEventListener('resize', updateViewportHeight);
     window.addEventListener('orientationchange', updateViewportHeight);
+
+    // Render tools from config
+    function renderTools() {
+        const toolsHTML = toolsConfig.map(tool => `
+            <a href="${tool.path}" class="sidebar-link">
+                <i class="${tool.icon}"></i> ${tool.name}
+            </a>
+        `).join('');
+        
+        toolsSection.innerHTML += toolsHTML;
+    }
 
     // Welcome modal
     if (!localStorage.getItem('rylac_welcome_shown') || localStorage.getItem('rylac_welcome_shown') === 'false') {
