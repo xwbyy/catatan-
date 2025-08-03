@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Facebook Downloader Pro</title>
+  <meta name="description" content="Download video dari Facebook dengan kualitas HD">
+  <meta name="keywords" content="Facebook Downloader, Download Facebook, Save Facebook Video">
+  <meta name="author" content="RyLac Team">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="https://files.catbox.moe/zj48ha.jpg" type="image/jpeg">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --primary-color: #1877F2; /* Facebook blue */
+      --secondary-color: #42B72A; /* Facebook green */
+      --danger-color: #FF3B30;
+      --dark-color: #1C1C1E;
+      --light-color: #F2F2F7;
+      --text-primary: #000000;
+      --text-secondary: #8E8E93;
+      --ios-blur: rgba(242, 242, 247, 0.8);
+      --ios-card-bg: rgba(255, 255, 255, 0.7);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    body {
+      background-color: var(--light-color);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 20px;
+      background-image: url('https://files.catbox.moe/zj48ha.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 22%;
+      margin-bottom: 15px;
+      object-fit: cover;
+      border: 2px solid var(--primary-color);
+    }
+    
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .search-box {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      padding: 20px;
+      border-radius: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    input[type="url"] {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      background-color: var(--ios-card-bg);
+      color: var(--text-primary);
+      backdrop-filter: blur(5px);
+    }
+    
+    input[type="url"]::placeholder {
+      color: var(--text-secondary);
+    }
+    
+    input[type="url"]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--primary-color);
+    }
+    
+    button {
+      padding: 0 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #166FE5;
+    }
+    
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #36A420;
+    }
+    
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .error-message {
+      color: var(--danger-color);
+      text-align: center;
+      padding: 15px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .card {
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .media-container {
+      position: relative;
+      padding-top: 100%;
+      background-color: var(--dark-color);
+    }
+    
+    .media-container img,
+    .media-container video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background-color: black;
+    }
+    
+    .card-info {
+      padding: 15px;
+    }
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+    
+    .download-btn {
+      display: inline-block;
+      padding: 8px 15px;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background-color 0.2s ease;
+    }
+    
+    .download-btn:hover {
+      background-color: #166FE5;
+    }
+    
+    .type-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      background-color: var(--secondary-color);
+      color: white;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .footer {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      border-radius: 20px;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+      background-color: var(--ios-blur);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .tab.active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+      .results {
+        grid-template-columns: 1fr;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+    }
+    
+    /* Language switcher */
+    .language-switcher {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+    
+    .language-btn {
+      background-color: var(--ios-card-bg);
+      border: none;
+      border-radius: 12px;
+      padding: 8px 15px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+      <button class="language-btn" id="language-btn">
+        <i class="fas fa-globe"></i>
+        <span id="current-language">ID</span>
+      </button>
+    </div>
+    
+    <header class="header">
+      <img src="https://files.catbox.moe/zj48ha.jpg" alt="Facebook Downloader Logo" class="logo">
+      <h1 id="main-title">Facebook Downloader Pro</h1>
+      <p class="subtitle" id="main-subtitle">Download video dari Facebook dengan kualitas HD</p>
+    </header>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="download">
+        <span id="tab-download">Download</span>
+      </div>
+      <div class="tab" data-tab="guide">
+        <span id="tab-guide">Panduan</span>
+      </div>
+      <div class="tab" data-tab="about">
+        <span id="tab-about">Tentang</span>
+      </div>
+    </div>
+    
+    <div class="tab-content active" id="download-tab">
+      <div class="search-box">
+        <div class="input-group">
+          <input type="url" id="url" placeholder="Tempel link Facebook di sini..." autocomplete="off">
+          <button class="btn-primary" id="download-btn">
+            <i class="fas fa-download"></i> <span id="download-text">Download</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="error-message" id="error-message"></div>
+      
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p id="loading-text">Memproses permintaan Anda...</p>
+      </div>
+      
+      <div class="results" id="results"></div>
+    </div>
+    
+    <div class="tab-content" id="guide-tab">
+      <div class="search-box">
+        <h2><i class="fas fa-book"></i> <span id="guide-title">Panduan Penggunaan</span></h2>
+        <ol id="guide-steps" style="padding-left: 20px; margin-top: 15px; display: flex; flex-direction: column; gap: 10px;">
+          <li>Salin link Facebook yang ingin Anda download</li>
+          <li>Tempel link tersebut ke dalam kolom input di atas</li>
+          <li>Klik tombol "Download"</li>
+          <li>Tunggu hingga proses selesai</li>
+          <li>Klik tombol "Download" pada video yang ingin disimpan</li>
+        </ol>
+        
+        <h3 style="margin-top: 20px;"><i class="fas fa-lightbulb"></i> <span id="tips-title">Tips</span></h3>
+        <ul id="tips-list" style="padding-left: 20px; margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+          <li>Pastikan link yang Anda tempel adalah link publik (bukan dari akun private)</li>
+          <li>Jika mengalami error, coba refresh halaman dan ulangi proses</li>
+          <li>Untuk video panjang, proses download mungkin membutuhkan waktu lebih lama</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="about-tab">
+      <div class="search-box">
+        <h2><i class="fas fa-info-circle"></i> <span id="about-title">Tentang Aplikasi</span></h2>
+        <p id="about-description" style="margin-top: 15px; line-height: 1.6;">
+          Facebook Downloader Pro adalah alat online yang memungkinkan Anda untuk mendownload video Facebook dengan mudah dan cepat. 
+          Aplikasi ini mendukung berbagai kualitas video termasuk HD dan Full HD.
+        </p>
+        
+        <h3 style="margin-top: 20px;"><i class="fas fa-code"></i> <span id="tech-title">Teknologi</span></h3>
+        <p id="tech-description" style="margin-top: 10px; line-height: 1.6;">
+          Dibangun dengan HTML5, CSS3, dan JavaScript modern. Menggunakan API pihak ketiga yang handal untuk mendapatkan video dengan kualitas terbaik.
+        </p>
+        
+        <h3 style="margin-top: 20px;"><i class="fas fa-shield-alt"></i> <span id="privacy-title">Privasi & Keamanan</span></h3>
+        <p id="privacy-description" style="margin-top: 10px; line-height: 1.6;">
+          Kami tidak menyimpan data pribadi Anda atau video yang Anda download. Semua proses dilakukan di perangkat Anda.
+        </p>
+      </div>
+    </div>
+    
+    <footer class="footer">
+      <p id="copyright">&copy; 2023 RyLac Team. All rights reserved.</p>
+      <p style="margin-top: 5px;">
+        <a href="#" style="color: var(--primary-color); text-decoration: none;" id="terms-link">Ketentuan Layanan</a> | 
+        <a href="#" style="color: var(--primary-color); text-decoration: none;" id="privacy-link">Kebijakan Privasi</a>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    // Language translations
+    const translations = {
+      en: {
+        mainTitle: "Facebook Downloader Pro",
+        mainSubtitle: "Download Facebook videos in HD quality",
+        tabDownload: "Download",
+        tabGuide: "Guide",
+        tabAbout: "About",
+        urlPlaceholder: "Paste Facebook link here...",
+        downloadText: "Download",
+        loadingText: "Processing your request...",
+        errorInvalidUrl: "Invalid Facebook URL. Please make sure the URL is from Facebook",
+        errorEmptyUrl: "Please enter a Facebook URL first",
+        errorNoMedia: "No video found at this URL",
+        errorGeneral: "An error occurred while processing your request",
+        guideTitle: "User Guide",
+        guideSteps: [
+          "Copy the Facebook link you want to download",
+          "Paste the link into the input field above",
+          "Click the \"Download\" button",
+          "Wait for the process to complete",
+          "Click the \"Download\" button on the video you want to save"
+        ],
+        tipsTitle: "Tips",
+        tipsList: [
+          "Make sure the link you paste is public (not from a private account)",
+          "If you encounter an error, try refreshing the page and repeating the process",
+          "For long videos, the download process may take longer"
+        ],
+        aboutTitle: "About the App",
+        aboutDescription: "Facebook Downloader Pro is an online tool that allows you to download Facebook videos easily and quickly. This application supports various video qualities including HD and Full HD.",
+        techTitle: "Technology",
+        techDescription: "Built with modern HTML5, CSS3, and JavaScript. Uses reliable third-party APIs to get videos with the best quality.",
+        privacyTitle: "Privacy & Security",
+        privacyDescription: "We do not store your personal data or the videos you download. All processes are done on your device.",
+        copyright: "© 2023 RyLac Team. All rights reserved.",
+        termsLink: "Terms of Service",
+        privacyLink: "Privacy Policy"
+      },
+      id: {
+        mainTitle: "Facebook Downloader Pro",
+        mainSubtitle: "Download video dari Facebook dengan kualitas HD",
+        tabDownload: "Download",
+        tabGuide: "Panduan",
+        tabAbout: "Tentang",
+        urlPlaceholder: "Tempel link Facebook di sini...",
+        downloadText: "Download",
+        loadingText: "Memproses permintaan Anda...",
+        errorInvalidUrl: "URL Facebook tidak valid. Pastikan URL berasal dari Facebook",
+        errorEmptyUrl: "Masukkan URL Facebook terlebih dahulu",
+        errorNoMedia: "Tidak ada video yang ditemukan di URL tersebut",
+        errorGeneral: "Terjadi kesalahan saat memproses permintaan Anda",
+        guideTitle: "Panduan Penggunaan",
+        guideSteps: [
+          "Salin link Facebook yang ingin Anda download",
+          "Tempel link tersebut ke dalam kolom input di atas",
+          "Klik tombol \"Download\"",
+          "Tunggu hingga proses selesai",
+          "Klik tombol \"Download\" pada video yang ingin disimpan"
+        ],
+        tipsTitle: "Tips",
+        tipsList: [
+          "Pastikan link yang Anda tempel adalah link publik (bukan dari akun private)",
+          "Jika mengalami error, coba refresh halaman dan ulangi proses",
+          "Untuk video panjang, proses download mungkin membutuhkan waktu lebih lama"
+        ],
+        aboutTitle: "Tentang Aplikasi",
+        aboutDescription: "Facebook Downloader Pro adalah alat online yang memungkinkan Anda untuk mendownload video Facebook dengan mudah dan cepat. Aplikasi ini mendukung berbagai kualitas video termasuk HD dan Full HD.",
+        techTitle: "Teknologi",
+        techDescription: "Dibangun dengan HTML5, CSS3, dan JavaScript modern. Menggunakan API pihak ketiga yang handal untuk mendapatkan video dengan kualitas terbaik.",
+        privacyTitle: "Privasi & Keamanan",
+        privacyDescription: "Kami tidak menyimpan data pribadi Anda atau video yang Anda download. Semua proses dilakukan di perangkat Anda.",
+        copyright: "© 2023 RyLac Team. All rights reserved.",
+        termsLink: "Ketentuan Layanan",
+        privacyLink: "Kebijakan Privasi"
+      }
+    };
+
+    // Current language
+    let currentLanguage = 'id';
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize language
+      const savedLanguage = localStorage.getItem('language') || 'id';
+      setLanguage(savedLanguage);
+      
+      // Language switcher
+      const languageBtn = document.getElementById('language-btn');
+      languageBtn.addEventListener('click', toggleLanguage);
+      
+      // Tab functionality
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs and contents
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          
+          // Add active class to clicked tab and corresponding content
+          tab.classList.add('active');
+          const tabId = tab.getAttribute('data-tab');
+          document.getElementById(`${tabId}-tab`).classList.add('active');
+        });
+      });
+      
+      // Download functionality
+      const downloadBtn = document.getElementById('download-btn');
+      const urlInput = document.getElementById('url');
+      const loading = document.getElementById('loading');
+      const errorMessage = document.getElementById('error-message');
+      const results = document.getElementById('results');
+      
+      downloadBtn.addEventListener('click', downloadContent);
+      urlInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          downloadContent();
+        }
+      });
+      
+      async function downloadContent() {
+        const url = urlInput.value.trim();
+        
+        // Validate URL
+        if (!url) {
+          showError(translations[currentLanguage].errorEmptyUrl);
+          return;
+        }
+        
+        if (!isValidFacebookUrl(url)) {
+          showError(translations[currentLanguage].errorInvalidUrl);
+          return;
+        }
+        
+        // Clear previous results and errors
+        results.innerHTML = '';
+        errorMessage.style.display = 'none';
+        
+        // Show loading
+        loading.style.display = 'block';
+        
+        try {
+          // Use Facebook API
+          const apiUrl = `https://api.ryzumi.vip/api/downloader/fbdl?url=${encodeURIComponent(url)}`;
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+          
+          if (data.status && data.data && data.data.length > 0) {
+            displayResults(data.data);
+          } else {
+            showError(translations[currentLanguage].errorNoMedia);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          showError(translations[currentLanguage].errorGeneral);
+        } finally {
+          loading.style.display = 'none';
+        }
+      }
+      
+      function isValidFacebookUrl(url) {
+        const facebookRegex = /^(https?:\/\/)?(www\.)?(facebook\.com|fb\.watch)\/.+/i;
+        return facebookRegex.test(url);
+      }
+      
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        loading.style.display = 'none';
+      }
+      
+      function displayResults(mediaItems) {
+        results.innerHTML = '';
+        
+        if (!mediaItems || mediaItems.length === 0) {
+          showError(translations[currentLanguage].errorNoMedia);
+          return;
+        }
+        
+        mediaItems.forEach((item, index) => {
+          if (!item.url) return;
+          
+          const card = document.createElement('div');
+          card.className = 'card';
+          
+          // Create media container
+          const mediaContainer = document.createElement('div');
+          mediaContainer.className = 'media-container';
+          
+          const video = document.createElement('video');
+          video.src = item.url;
+          video.controls = true;
+          if (item.thumbnail) {
+            video.poster = item.thumbnail;
+          }
+          mediaContainer.appendChild(video);
+          
+          // Create card info
+          const cardInfo = document.createElement('div');
+          cardInfo.className = 'card-info';
+          
+          const title = document.createElement('h3');
+          title.className = 'card-title';
+          title.textContent = `Facebook Video ${index + 1}`;
+          if (item.resolution) {
+            title.textContent += ` (${item.resolution})`;
+          }
+          
+          const meta = document.createElement('div');
+          meta.className = 'card-meta';
+          
+          const typeBadge = document.createElement('span');
+          typeBadge.className = 'type-badge';
+          typeBadge.textContent = 'VIDEO';
+          
+          const downloadLink = document.createElement('a');
+          downloadLink.className = 'download-btn';
+          downloadLink.href = item.url;
+          downloadLink.download = '';
+          downloadLink.textContent = translations[currentLanguage].downloadText;
+          downloadLink.target = '_blank';
+          
+          meta.appendChild(typeBadge);
+          meta.appendChild(downloadLink);
+          
+          cardInfo.appendChild(title);
+          cardInfo.appendChild(meta);
+          
+          card.appendChild(mediaContainer);
+          card.appendChild(cardInfo);
+          
+          results.appendChild(card);
+        });
+      }
+    });
+    
+    function toggleLanguage() {
+      const newLanguage = currentLanguage === 'id' ? 'en' : 'id';
+      setLanguage(newLanguage);
+      localStorage.setItem('language', newLanguage);
+    }
+    
+    function setLanguage(lang) {
+      currentLanguage = lang;
+      document.getElementById('current-language').textContent = lang.toUpperCase();
+      
+      // Update all text elements
+      const translation = translations[lang];
+      
+      document.getElementById('main-title').textContent = translation.mainTitle;
+      document.getElementById('main-subtitle').textContent = translation.mainSubtitle;
+      document.getElementById('tab-download').textContent = translation.tabDownload;
+      document.getElementById('tab-guide').textContent = translation.tabGuide;
+      document.getElementById('tab-about').textContent = translation.tabAbout;
+      document.getElementById('url').placeholder = translation.urlPlaceholder;
+      document.getElementById('download-text').textContent = translation.downloadText;
+      document.getElementById('loading-text').textContent = translation.loadingText;
+      document.getElementById('guide-title').textContent = translation.guideTitle;
+      document.getElementById('tips-title').textContent = translation.tipsTitle;
+      document.getElementById('about-title').textContent = translation.aboutTitle;
+      document.getElementById('about-description').textContent = translation.aboutDescription;
+      document.getElementById('tech-title').textContent = translation.techTitle;
+      document.getElementById('tech-description').textContent = translation.techDescription;
+      document.getElementById('privacy-title').textContent = translation.privacyTitle;
+      document.getElementById('privacy-description').textContent = translation.privacyDescription;
+      document.getElementById('copyright').textContent = translation.copyright;
+      document.getElementById('terms-link').textContent = translation.termsLink;
+      document.getElementById('privacy-link').textContent = translation.privacyLink;
+      
+      // Update guide steps
+      const guideSteps = document.getElementById('guide-steps');
+      guideSteps.innerHTML = '';
+      translation.guideSteps.forEach(step => {
+        const li = document.createElement('li');
+        li.textContent = step;
+        guideSteps.appendChild(li);
+      });
+      
+      // Update tips list
+      const tipsList = document.getElementById('tips-list');
+      tipsList.innerHTML = '';
+      translation.tipsList.forEach(tip => {
+        const li = document.createElement('li');
+        li.textContent = tip;
+        tipsList.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>

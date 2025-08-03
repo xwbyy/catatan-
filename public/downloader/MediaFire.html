@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediaFire Downloader | Unduh File Tanpa Iklan</title>
+  <meta name="description" content="Unduh file dari MediaFire tanpa iklan dan batasan">
+  <meta name="keywords" content="mediafire downloader, unduh mediafire, download mediafire">
+  <meta name="author" content="RyLac Team">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #2C6BED;
+      --primary-light: #4D8EFF;
+      --secondary: #1A4DB3;
+      --success: #10B981;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --dark: #1F2937;
+      --light: #F9FAFB;
+      --gray: #6B7280;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --glass-bg: rgba(255, 255, 255, 0.2);
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+      color: var(--dark);
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: var(--transition);
+    }
+    
+    .header:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--primary);
+    }
+    
+    .logo {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      color: var(--gray);
+      font-size: 1rem;
+      margin-bottom: 5px;
+    }
+    
+    /* Search Box */
+    .search-box {
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 25px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: var(--transition);
+    }
+    
+    .search-box:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 12px;
+    }
+    
+    input[type="text"] {
+      flex: 1;
+      padding: 16px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      background: var(--card-bg);
+      color: var(--dark);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: var(--transition);
+    }
+    
+    input[type="text"]::placeholder {
+      color: var(--gray);
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(44, 107, 237, 0.3);
+    }
+    
+    button {
+      padding: 0 24px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(44, 107, 237, 0.3);
+    }
+    
+    /* Loading Animation */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 30px;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(44, 107, 237, 0.1);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Error Message */
+    .error-message {
+      color: var(--danger);
+      text-align: center;
+      padding: 16px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+      box-shadow: var(--shadow);
+    }
+    
+    /* Results Section */
+    .results {
+      display: none;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+      transition: var(--transition);
+    }
+    
+    .results.show {
+      display: block;
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    .file-info {
+      margin-bottom: 20px;
+    }
+    
+    .info-row {
+      display: flex;
+      margin-bottom: 12px;
+    }
+    
+    .info-label {
+      font-weight: 600;
+      min-width: 120px;
+      color: var(--gray);
+    }
+    
+    .info-value {
+      flex: 1;
+      font-weight: 500;
+    }
+    
+    .file-name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .file-name i {
+      color: var(--primary);
+    }
+    
+    .download-btn {
+      display: inline-block;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      color: white;
+      text-align: center;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition);
+      border: none;
+      cursor: pointer;
+      margin-top: 15px;
+      box-shadow: 0 4px 6px rgba(44, 107, 237, 0.2);
+    }
+    
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px rgba(44, 107, 237, 0.3);
+    }
+    
+    .download-btn i {
+      margin-right: 8px;
+    }
+    
+    /* Footer */
+    .footer {
+      text-align: center;
+      color: var(--gray);
+      font-size: 0.9rem;
+      padding: 20px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--dark);
+      color: white;
+      padding: 14px 24px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: var(--transition);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .toast.show {
+      opacity: 1;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      h1 {
+        font-size: 1.6rem;
+      }
+      
+      .input-group {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+        padding: 16px;
+      }
+      
+      .info-row {
+        flex-direction: column;
+        gap: 5px;
+      }
+      
+      .info-label {
+        min-width: auto;
+      }
+    }
+    
+    /* Animation Effects */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo">
+        <i class="fab fa-medapps"></i>
+      </div>
+      <h1>MediaFire Downloader</h1>
+      <p class="subtitle">Unduh file dari MediaFire tanpa iklan dan batasan</p>
+    </header>
+    
+    <div class="search-box">
+      <div class="input-group">
+        <input type="text" id="search-input" placeholder="Masukkan link MediaFire (Contoh: https://www.mediafire.com/file/abc123/file.zip)" autocomplete="off">
+        <button class="btn-primary" id="search-btn">
+          <i class="fas fa-search"></i> Cari
+        </button>
+      </div>
+    </div>
+    
+    <div class="error-message" id="error-message"></div>
+    
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Memproses link MediaFire...</p>
+    </div>
+    
+    <div class="results" id="results">
+      <div class="file-info">
+        <div class="file-name">
+          <i class="fas fa-file-alt"></i>
+          <span id="filename">Nama File</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Ukuran File:</span>
+          <span class="info-value" id="filesize">-</span>
+        </div>
+      </div>
+      <button class="download-btn" id="download-btn">
+        <i class="fas fa-download"></i> Unduh Sekarang
+      </button>
+    </div>
+    
+    <footer class="footer">
+      <p>&copy; 2023 <strong>RyLac Team</strong>. All rights reserved.</p>
+    </footer>
+    
+    <div class="toast" id="toast">
+      <i class="fas fa-check-circle"></i>
+      <span>Link berhasil disalin!</span>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchBtn = document.getElementById('search-btn');
+      const searchInput = document.getElementById('search-input');
+      const loading = document.getElementById('loading');
+      const errorMessage = document.getElementById('error-message');
+      const results = document.getElementById('results');
+      const toast = document.getElementById('toast');
+      const filenameEl = document.getElementById('filename');
+      const filesizeEl = document.getElementById('filesize');
+      const downloadBtn = document.getElementById('download-btn');
+      
+      // Focus on input when page loads
+      searchInput.focus();
+      
+      // Event Listeners
+      searchBtn.addEventListener('click', getDownloadLink);
+      searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          getDownloadLink();
+        }
+      });
+      
+      // Main Function to Get Download Link
+      async function getDownloadLink() {
+        const url = searchInput.value.trim();
+        
+        // Validate input
+        if (!url) {
+          showError('Masukkan link MediaFire terlebih dahulu');
+          return;
+        }
+        
+        if (!url.includes('mediafire.com')) {
+          showError('Link harus dari MediaFire');
+          return;
+        }
+        
+        // Clear previous results and errors
+        results.classList.remove('show');
+        errorMessage.style.display = 'none';
+        
+        // Show loading animation
+        loading.style.display = 'block';
+        
+        try {
+          // Encode URL for API
+          const encodedUrl = encodeURIComponent(url);
+          
+          // Build API URL
+          const apiUrl = `https://api.ryzumi.vip/api/downloader/mediafire?url=${encodedUrl}`;
+          
+          // Fetch data from API
+          const response = await fetch(apiUrl);
+          
+          if (!response.ok) {
+            throw new Error('Gagal mengambil data');
+          }
+          
+          const data = await response.json();
+          
+          // Display results
+          if (!data.status) {
+            showError(data.message || 'Gagal mendapatkan link download');
+          } else {
+            displayResults(data.data);
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          showError('Terjadi kesalahan saat memproses link');
+        } finally {
+          loading.style.display = 'none';
+        }
+      }
+      
+      // Show error message
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        loading.style.display = 'none';
+      }
+      
+      // Display download information
+      function displayResults(data) {
+        filenameEl.textContent = data.filename;
+        filesizeEl.textContent = data.filesize;
+        
+        // Set download button
+        downloadBtn.onclick = function() {
+          window.open(data.downloadUrl, '_blank');
+        };
+        
+        // Show results
+        results.classList.add('show');
+      }
+      
+      // Show toast notification
+      function showToast(message) {
+        toast.querySelector('span').textContent = message;
+        toast.classList.add('show');
+        
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
