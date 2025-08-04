@@ -1,4 +1,4 @@
-// config.js
+// config.js 
 const toolsConfig = [
     {
         name: "Instagram Downloader",
@@ -8,7 +8,7 @@ const toolsConfig = [
     {
         name: "Twitter Downloader",
         icon: "fab fa-twitter",
-        path: "twitdl.html"
+        path: "/downloader/twitdl.html"
     },
     {
         name: "TikTok Downloader",
@@ -74,5 +74,20 @@ const toolsConfig = [
         name: "Threads Downloader",
         icon: "fas fa-image",
         path: "/downloader/threads.html"
+    },
+    {
+        name: "Kalender",
+        icon: "fas fa-calendar-alt",
+        path: "/tools/kalender.html"
+    },
+    {
+        name: "Lacak Paket",
+        icon: "fas fa-truck",
+        path: "/checker/lacakpaket.html"
+    },
+    {
+        name: "Cek NIM",
+        icon: "fas fa-id-card",
+        path: "/checker/ceknim.html"
     }
 ];
