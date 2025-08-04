@@ -88,6 +88,6 @@ const toolsConfig = [
     {
         name: "Cek NIM",
         icon: "fas fa-id-card",
-        path: "/checker/ceknim.html"
+        path: "/tools/ceknim.html"
     }
 ];
