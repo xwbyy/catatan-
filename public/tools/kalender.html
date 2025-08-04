@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indonesian Events Calendar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f8961e;
+            --danger-color: #f72585;
+            --gray-color: #6c757d;
+            --white-color: #ffffff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--white-color);
+            box-shadow: var(--shadow);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-radius: var(--border-radius);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .date-display {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--gray-color);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        @media (min-width: 992px) {
+            .main-content {
+                grid-template-columns: 300px 1fr;
+            }
+        }
+
+        .calendar-container {
+            background-color: var(--white-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            height: fit-content;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            background-color: var(--light-color);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav button:hover {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .calendar-weekday {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--gray-color);
+            text-transform: uppercase;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .calendar-day:hover {
+            background-color: var(--light-color);
+        }
+
+        .calendar-day.today {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            font-weight: 600;
+        }
+
+        .calendar-day.selected {
+            background-color: var(--secondary-color);
+            color: var(--white-color);
+            font-weight: 600;
+        }
+
+        .calendar-day.has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            width: 5px;
+            height: 5px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+        }
+
+        .calendar-day.today.has-event::after,
+        .calendar-day.selected.has-event::after {
+            background-color: var(--white-color);
+        }
+
+        .calendar-day.other-month {
+            color: #ccc;
+        }
+
+        .events-container {
+            background-color: var(--white-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+
+        .events-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .events-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .event-filter {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--light-color);
+            background-color: var(--white-color);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            border-color: var(--primary-color);
+        }
+
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .event-day {
+            margin-bottom: 20px;
+        }
+
+        .event-day-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .event-date {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .event-date-line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: var(--light-color);
+        }
+
+        .event-item {
+            display: flex;
+            gap: 15px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            background-color: var(--light-color);
+            transition: all 0.3s ease;
+        }
+
+        .event-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .event-badge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white-color);
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .event-badge.holiday {
+            background-color: var(--danger-color);
+        }
+
+        .event-badge.national {
+            background-color: var(--success-color);
+        }
+
+        .event-badge.other {
+            background-color: var(--warning-color);
+        }
+
+        .event-content {
+            flex-grow: 1;
+        }
+
+        .event-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+
+        .event-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--gray-color);
+        }
+
+        .event-source {
+            padding: 2px 8px;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .no-events {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray-color);
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .event-filter {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .event-item {
+                flex-direction: column;
+            }
+
+            .event-badge {
+                align-self: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content container">
+            <div class="logo">
+                <i class="fas fa-calendar-alt"></i>
+                <h1>Indonesian Events</h1>
+            </div>
+            <div class="date-display" id="currentDate"></div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-title" id="calendarMonthYear"></div>
+                    <div class="calendar-nav">
+                        <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                        <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="calendar-weekday">Sun</div>
+                    <div class="calendar-weekday">Mon</div>
+                    <div class="calendar-weekday">Tue</div>
+                    <div class="calendar-weekday">Wed</div>
+                    <div class="calendar-weekday">Thu</div>
+                    <div class="calendar-weekday">Fri</div>
+                    <div class="calendar-weekday">Sat</div>
+                </div>
+                <div class="calendar-days" id="calendarDays"></div>
+            </div>
+
+            <div class="events-container">
+                <div class="events-header">
+                    <div class="events-title">Events</div>
+                    <div class="event-filter">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="holiday">Holidays</button>
+                        <button class="filter-btn" data-filter="national">National</button>
+                        <button class="filter-btn" data-filter="other">Other</button>
+                    </div>
+                </div>
+                <div class="events-list" id="eventsList">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Current date
+            const currentDate = new Date();
+            let currentMonth = currentDate.getMonth();
+            let currentYear = currentDate.getFullYear();
+            let selectedDate = currentDate;
+
+            // DOM elements
+            const calendarMonthYear = document.getElementById('calendarMonthYear');
+            const calendarDays = document.getElementById('calendarDays');
+            const prevMonthBtn = document.getElementById('prevMonth');
+            const nextMonthBtn = document.getElementById('nextMonth');
+            const currentDateDisplay = document.getElementById('currentDate');
+            const eventsList = document.getElementById('eventsList');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            // Event data
+            let allEvents = [];
+            let eventDates = new Set();
+
+            // Initialize calendar
+            function initCalendar() {
+                updateCalendar();
+                fetchEvents();
+                updateCurrentDateDisplay();
+            }
+
+            // Update calendar display
+            function updateCalendar() {
+                // Set month and year title
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                calendarMonthYear.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+
+                // Get first day of month and total days
+                const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+                const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+                // Clear calendar
+                calendarDays.innerHTML = '';
+
+                // Previous month days
+                for (let i = firstDay; i > 0; i--) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day other-month';
+                    dayElement.textContent = daysInPrevMonth - i + 1;
+                    calendarDays.appendChild(dayElement);
+                }
+
+                // Current month days
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day';
+                    dayElement.textContent = i;
+
+                    // Check if day is today
+                    const date = new Date(currentYear, currentMonth, i);
+                    if (date.toDateString() === new Date().toDateString()) {
+                        dayElement.classList.add('today');
+                    }
+
+                    // Check if day is selected
+                    if (date.toDateString() === selectedDate.toDateString()) {
+                        dayElement.classList.add('selected');
+                    }
+
+                    // Check if day has events
+                    const dateStr = formatDate(date);
+                    if (eventDates.has(dateStr)) {
+                        dayElement.classList.add('has-event');
+                    }
+
+                    // Add click event
+                    dayElement.addEventListener('click', () => {
+                        selectedDate = new Date(currentYear, currentMonth, i);
+                        updateCalendar();
+                        displayEventsForDate(selectedDate);
+                    });
+
+                    calendarDays.appendChild(dayElement);
+                }
+
+                // Next month days
+                const totalCells = firstDay + daysInMonth;
+                const remainingCells = totalCells > 35 ? 42 - totalCells : 35 - totalCells;
+                
+                for (let i = 1; i <= remainingCells; i++) {
+                    const dayElement = document.createElement('div');
+                    dayElement.className = 'calendar-day other-month';
+                    dayElement.textContent = i;
+                    calendarDays.appendChild(dayElement);
+                }
+            }
+
+            // Fetch events from API
+            function fetchEvents() {
+                eventsList.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+                
+                fetch('https://api.siputzx.my.id/api/info/event-Indonesia')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status && data.data) {
+                            processEvents(data.data);
+                            updateCalendar();
+                            displayEventsForDate(selectedDate);
+                        } else {
+                            throw new Error('Invalid data format');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching events:', error);
+                        eventsList.innerHTML = '<div class="no-events">Failed to load events. Please try again later.</div>';
+                    });
+            }
+
+            // Process events data
+            function processEvents(data) {
+                allEvents = [];
+                eventDates = new Set();
+
+                // Process upcoming national events
+                if (data.mendatang && data.mendatang.event_nasional) {
+                    data.mendatang.event_nasional.forEach(event => {
+                        const eventDate = parseDateString(event.date, currentYear);
+                        allEvents.push({
+                            date: eventDate,
+                            dateStr: formatDate(eventDate),
+                            title: event.event,
+                            source: event.source,
+                            type: 'national'
+                        });
+                        eventDates.add(formatDate(eventDate));
+                    });
+                }
+
+                // Process holidays
+                if (data.mendatang && data.mendatang.hari_libur) {
+                    data.mendatang.hari_libur.forEach(event => {
+                        const eventDate = parseDateString(event.date, currentYear);
+                        allEvents.push({
+                            date: eventDate,
+                            dateStr: formatDate(eventDate),
+                            title: event.event,
+                            source: event.source,
+                            type: 'holiday'
+                        });
+                        eventDates.add(formatDate(eventDate));
+                    });
+                }
+
+                // Process all events from the complete list
+                if (data.data && data.data.semua_event) {
+                    data.data.semua_event.forEach(event => {
+                        const eventDate = parseDateString(event.date, currentYear);
+                        const existingEvent = allEvents.find(e => 
+                            e.dateStr === formatDate(eventDate) && e.title === event.event
+                        );
+                        
+                        if (!existingEvent) {
+                            const type = event.event.toLowerCase().includes('hari raya') || 
+                                         event.event.toLowerCase().includes('cuti bersama') ||
+                                         event.event.toLowerCase().includes('natal') ||
+                                         event.event.toLowerCase().includes('maulid') ||
+                                         event.event.toLowerCase().includes('tahun baru') ?
+                                         'holiday' : 'other';
+                                         
+                            allEvents.push({
+                                date: eventDate,
+                                dateStr: formatDate(eventDate),
+                                title: event.event,
+                                source: event.source,
+                                type: type
+                            });
+                            eventDates.add(formatDate(eventDate));
+                        }
+                    });
+                }
+            }
+
+            // Display events for selected date
+            function displayEventsForDate(date) {
+                const dateStr = formatDate(date);
+                const filteredEvents = allEvents.filter(event => event.dateStr === dateStr);
+                
+                if (filteredEvents.length === 0) {
+                    eventsList.innerHTML = '<div class="no-events">No events for this date</div>';
+                    return;
+                }
+
+                // Group by date (though they're all the same date in this case)
+                const eventsByDate = {};
+                filteredEvents.forEach(event => {
+                    if (!eventsByDate[event.dateStr]) {
+                        eventsByDate[event.dateStr] = [];
+                    }
+                    eventsByDate[event.dateStr].push(event);
+                });
+
+                // Display events
+                let html = '';
+                for (const dateStr in eventsByDate) {
+                    const events = eventsByDate[dateStr];
+                    
+                    html += `<div class="event-day">
+                        <div class="event-day-header">
+                            <div class="event-date">${formatDateForDisplay(new Date(dateStr))}</div>
+                            <div class="event-date-line"></div>
+                        </div>`;
+                    
+                    events.forEach(event => {
+                        html += `<div class="event-item" data-type="${event.type}">
+                            <div class="event-badge ${event.type}">${event.type.charAt(0).toUpperCase()}</div>
+                            <div class="event-content">
+                                <div class="event-title">${event.title}</div>
+                                <div class="event-meta">
+                                    <div class="event-source">${event.source}</div>
+                                </div>
+                            </div>
+                        </div>`;
+                    });
+                    
+                    html += `</div>`;
+                }
+
+                eventsList.innerHTML = html;
+                applyFilter('all'); // Show all events by default
+            }
+
+            // Apply filter to events
+            function applyFilter(filterType) {
+                const eventItems = document.querySelectorAll('.event-item');
+                
+                eventItems.forEach(item => {
+                    if (filterType === 'all' || item.dataset.type === filterType) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                // Update active filter button
+                filterButtons.forEach(btn => {
+                    if (btn.dataset.filter === filterType) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                // Check if no events are visible
+                const visibleEvents = document.querySelectorAll('.event-item[style="display: flex;"]');
+                if (visibleEvents.length === 0 && eventItems.length > 0) {
+                    eventsList.innerHTML = '<div class="no-events">No events match the selected filter</div>';
+                }
+            }
+
+            // Helper functions
+            function formatDate(date) {
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                return `${month}-${day}`;
+            }
+
+            function formatDateForDisplay(date) {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('en-US', options);
+            }
+
+            function parseDateString(dateStr, year) {
+                const [month, day] = dateStr.split('-').map(Number);
+                return new Date(year, month - 1, day);
+            }
+
+            function updateCurrentDateDisplay() {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                currentDateDisplay.textContent = new Date().toLocaleDateString('en-US', options);
+            }
+
+            // Event listeners
+            prevMonthBtn.addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                updateCalendar();
+            });
+
+            nextMonthBtn.addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                updateCalendar();
+            });
+
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    applyFilter(btn.dataset.filter);
+                });
+            });
+
+            // Initialize
+            initCalendar();
+        });
+    </script>
+</body>
+</html>
