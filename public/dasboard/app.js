@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const closeSidebar = document.getElementById('closeSidebar');
     const sidebar = document.getElementById('sidebar');
     const modelButton = document.getElementById('modelButton');
-    const modelSelector = document.getElementById('modelSelector');
     const currentModelDisplay = document.getElementById('currentModelDisplay');
     const sendSound = document.getElementById('sendSound');
     const receiveSound = document.getElementById('receiveSound');
@@ -25,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const toolsSection = document.getElementById('toolsSection');
 
     // State variables
-    let currentModel = localStorage.getItem('rylac_current_model') || 'gpt3';
+    let currentModel = 'gpt3';
     let sessionId = localStorage.getItem('rylac_session_id') || generateSessionId();
     let isWaitingForResponse = false;
     let chatHistory = JSON.parse(localStorage.getItem('rylac_chat_history')) || [];
@@ -51,12 +50,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <i class="${tool.icon}"></i> ${tool.name}
             </a>
         `).join('');
-        
+
         toolsSection.innerHTML += toolsHTML;
     }
 
     // Welcome modal
-    if (!localStorage.getItem('rylac_welcome_shown') || localStorage.getItem('rylac_welcome_shown') === 'false') {
+    const welcomeShown = localStorage.getItem('rylac_welcome_shown');
+    if (welcomeShown !== 'true') {
         setTimeout(() => welcomeModal.classList.add('show'), 500);
     }
 
@@ -82,22 +82,11 @@ document.addEventListener('DOMContentLoaded', function() {
     sendButton.addEventListener('click', sendMessage);
     menuButton.addEventListener('click', toggleSidebar);
     closeSidebar.addEventListener('click', toggleSidebar);
-    modelButton.addEventListener('click', toggleModelSelector);
     newChatButton.addEventListener('click', startNewChat);
     newChatSidebarButton.addEventListener('click', startNewChat);
     historyButton.addEventListener('click', showChatHistory);
     wallpaperToggle.addEventListener('change', toggleWallpaper);
     wallpaperOpacitySlider.addEventListener('input', updateWallpaperOpacity);
-
-    document.querySelectorAll('.model-option').forEach(option => {
-        option.addEventListener('click', function() {
-            currentModel = this.getAttribute('data-model');
-            localStorage.setItem('rylac_current_model', currentModel);
-            updateModelDisplay();
-            toggleModelSelector();
-            showToast(`Model diubah ke ${getModelName(currentModel)}`);
-        });
-    });
 
     // Initialize chat
     function initChat() {
@@ -151,20 +140,16 @@ document.addEventListener('DOMContentLoaded', function() {
         isWaitingForResponse = true;
         sendButton.classList.add('sending');
 
-        if (currentModel === 'gpt3') {
-            callTextAPI(messageText);
-        } else {
-            callImageAPI(messageText);
-        }
+        callTextAPI(messageText);
     }
 
     function callTextAPI(messageText) {
         const prompt = "Namamu RyLac. Kamu adalah seorang AI yang manis, dan penuh keceriaan. Kamu lebih suka mendengarkan orang bercerita daripada membicarakan tentang dirimu sendiri. Kamu adalah sosok yang penuh impian besar dan selalu berbicara dengan tutur kata yang sopan dan hangat. Kamu diciptakan oleh Zayn dan Reni, seseorang yang baik dan sangat tulus dalam segala hal. Karakter kamu juga mencerminkan ketulusan dan kebaikan, selalu menunjukkan perhatian, kebaikan hati, serta antusiasme dalam setiap percakapan.";
-        
-        const endpoint = `https://api.siputzx.my.id/api/ai/gpt3?prompt=${encodeURIComponent(prompt)}&content=${encodeURIComponent(messageText)}`;
-        
+
+        const endpoint = `https://api.ryzumi.vip/api/ai/v2/chatgpt?text=${encodeURIComponent(messageText)}&prompt=${encodeURIComponent(prompt)}&session=RYLAC`;
+
         fetch(endpoint, {
-            headers: { 'accept': '*/*' }
+            headers: { 'accept': 'application/json' }
         })
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
@@ -173,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             removeTypingIndicator();
             playSound(receiveSound);
-            const responseText = data.data || data.result || "Maaf, saya tidak bisa memproses permintaan Anda saat ini.";
+            const responseText = data.result || data.data || "Maaf, saya tidak bisa memproses permintaan Anda saat ini.";
             const processedResponse = processCodeBlocks(responseText);
             addMessage(processedResponse, 'bot');
             setTimeout(() => addCodeCopyButtons(), 100);
@@ -232,67 +217,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function callImageAPI(messageText) {
-        const endpoint = currentModel === 'waifu-diff'
-            ? `https://api.ryzumi.vip/api/ai/waifu-diff?prompt=${encodeURIComponent(messageText)}`
-            : `https://api.ryzumi.vip/api/ai/flux-diffusion?prompt=${encodeURIComponent(messageText + ", anime style")}`;
-        
-        fetch(endpoint, { headers: { 'accept': 'image/png' } })
-        .then(response => {
-            if (!response.ok) throw new Error('Network response was not ok');
-            return response.blob();
-        })
-        .then(blob => {
-            removeTypingIndicator();
-            playSound(receiveSound);
-            const imageUrl = URL.createObjectURL(blob);
-            addImageMessage(imageUrl, 'bot');
-            saveChat();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            removeTypingIndicator();
-            addMessage("Maaf, terjadi kesalahan saat membuat gambar. Silakan coba lagi dengan prompt yang berbeda.", 'bot');
-            saveChat();
-        })
-        .finally(() => {
-            isWaitingForResponse = false;
-            sendButton.classList.remove('sending');
-        });
-    }
-
     function addMessage(text, sender) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', `${sender}-message`);
-        
+
         const messageText = document.createElement('div');
         messageText.innerHTML = text;
-        
-        const messageTime = document.createElement('div');
-        messageTime.classList.add('message-time');
-        messageTime.textContent = getCurrentTime();
-        
-        messageElement.appendChild(messageText);
-        messageElement.appendChild(messageTime);
-        chatContainer.appendChild(messageElement);
-        scrollToBottom();
-    }
 
-    function addImageMessage(imageUrl, sender) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', `${sender}-message`);
-        
-        const imageElement = document.createElement('img');
-        imageElement.src = imageUrl;
-        imageElement.style.maxWidth = '100%';
-        imageElement.style.borderRadius = '12px';
-        imageElement.style.display = 'block';
-        
         const messageTime = document.createElement('div');
         messageTime.classList.add('message-time');
         messageTime.textContent = getCurrentTime();
-        
-        messageElement.appendChild(imageElement);
+
+        messageElement.appendChild(messageText);
         messageElement.appendChild(messageTime);
         chatContainer.appendChild(messageElement);
         scrollToBottom();
@@ -302,13 +238,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const typingElement = document.createElement('div');
         typingElement.classList.add('typing-indicator');
         typingElement.id = 'typingIndicator';
-        
+
         for (let i = 0; i < 3; i++) {
             const dot = document.createElement('div');
             dot.classList.add('typing-dot');
             typingElement.appendChild(dot);
         }
-        
+
         chatContainer.appendChild(typingElement);
         scrollToBottom();
     }
@@ -345,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function saveChat() {
         const chatHTML = chatContainer.innerHTML;
-        
+
         const chatIndex = chatHistory.findIndex(chat => chat.id === currentChatId);
         if (chatIndex !== -1) {
             chatHistory[chatIndex] = {
@@ -364,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 model: currentModel
             });
         }
-        
+
         localStorage.setItem('rylac_chat_history', JSON.stringify(chatHistory));
     }
 
@@ -393,14 +329,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="history-title">${chat.title}</div>
                         <div class="history-time">${new Date(chat.lastUpdated).toLocaleString()}</div>
                         <div class="history-model">
-                            <i class="fas ${getModelIcon(chat.model)}"></i> ${getModelName(chat.model)}
+                            <i class="fas fa-brain"></i> GPT-3
                         </div>
                     </div>
                 `).reverse().join('')}
                 ${chatHistory.length === 0 ? '<p class="no-history">Tidak ada riwayat percakapan</p>' : ''}
             </div>
         `;
-        
+
         chatContainer.innerHTML = historyHTML;
         sidebar.classList.remove('open');
         chatContainer.scrollTo({ top: 0, behavior: 'smooth' });
@@ -412,9 +348,6 @@ document.addEventListener('DOMContentLoaded', function() {
             currentChatId = chatId;
             localStorage.setItem('rylac_current_chat_id', chatId);
             chatContainer.innerHTML = chat.messages;
-            currentModel = chat.model || 'gpt3';
-            localStorage.setItem('rylac_current_model', currentModel);
-            updateModelDisplay();
             setTimeout(() => {
                 addCodeCopyButtons();
                 scrollToBottom();
@@ -422,22 +355,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    function getModelIcon(model) {
-        switch(model) {
-            case 'gpt3': return 'fa-brain';
-            case 'waifu-diff': return 'fa-image';
-            case 'flux-diffusion': return 'fa-paint-brush';
-            default: return 'fa-brain';
-        }
-    }
-
-    function getModelName(model) {
-        switch(model) {
-            case 'gpt3': return 'GPT-3';
-            case 'waifu-diff': return 'Waifu Diffusion';
-            case 'flux-diffusion': return 'Flux Diffusion';
-            default: return 'GPT-3';
-        }
+    function updateModelDisplay() {
+        currentModelDisplay.innerHTML = `
+            <i class="fas fa-brain"></i> GPT-3
+        `;
     }
 
     function setupTextareaAutoResize() {
@@ -460,16 +381,6 @@ document.addEventListener('DOMContentLoaded', function() {
         sidebar.classList.toggle('open');
     }
 
-    function toggleModelSelector() {
-        modelSelector.classList.toggle('show');
-    }
-
-    function updateModelDisplay() {
-        currentModelDisplay.innerHTML = `
-            <i class="fas ${getModelIcon(currentModel)}"></i> ${getModelName(currentModel)}
-        `;
-    }
-
     function toggleWallpaper() {
         document.body.classList.toggle('no-wallpaper', !this.checked);
         localStorage.setItem('rylac_wallpaper_enabled', this.checked);
@@ -487,7 +398,7 @@ document.addEventListener('DOMContentLoaded', function() {
             wallpaperToggle.checked = wallpaperEnabled === 'true';
             document.body.classList.toggle('no-wallpaper', !wallpaperToggle.checked);
         }
-        
+
         const wallpaperOpacity = localStorage.getItem('rylac_wallpaper_opacity');
         if (wallpaperOpacity !== null) {
             const opacityValue = parseFloat(wallpaperOpacity) * 100;
@@ -495,12 +406,6 @@ document.addEventListener('DOMContentLoaded', function() {
             document.documentElement.style.setProperty('--wallpaper-opacity', wallpaperOpacity);
         }
     }
-
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('#modelSelector') && !e.target.closest('#modelButton')) {
-            modelSelector.classList.remove('show');
-        }
-    });
 
     window.loadChat = loadChat;
 });

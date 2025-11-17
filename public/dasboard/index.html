@@ -7,27 +7,27 @@
     <meta name="description" content="RyLac AI Chat adalah asisten cerdas multi-fungsi yang siap membantu berbagai kebutuhan Anda, dari chatting hingga tools praktis.">
     <meta name="keywords" content="RyLac, AI Chat, Tools, Multi Fungsi, Asisten Virtual, OpenAI, ChatGPT">
     <meta name="author" content="Zayn dan Reni">
-    
+
     <!-- Favicon -->
     <link rel="icon" href="https://files.catbox.moe/zj48ha.jpg" type="image/jpeg">
-    
+
     <!-- Open Graph (untuk berbagi di media sosial) -->
     <meta property="og:title" content="RyLac AI Chat - TOOLS Multi Fungsi">
     <meta property="og:description" content="Asisten AI pintar dan ceria siap menemani dan membantu aktivitas Anda.">
     <meta property="og:image" content="https://files.catbox.moe/zj48ha.jpg">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://namasitusanda.com">
-    
+
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8511287367525783" crossorigin="anonymous"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="wallpaper"></div>
-    
+
     <!-- Welcome Modal -->
     <div class="modal-overlay" id="welcomeModal">
         <div class="modal-content">
@@ -35,7 +35,7 @@
                 <div class="modal-title">Selamat Datang di RyLac AI</div>
                 <button class="close-modal" id="closeModal">&times;</button>
             </div>
-            
+
             <div class="modal-section">
                 <div class="modal-section-title">Informasi Update</div>
                 <p class="modal-text">
@@ -64,7 +64,7 @@
                     A: Klik menu Donasi di sidebar
                 </p>
             </div>
-            
+
             <!-- AdSense Ad Unit -->
             <div class="ad-container">
                 <ins class="adsbygoogle"
@@ -77,19 +77,19 @@
                      (adsbygoogle = window.adsbygoogle || []).push({});
                 </script>
             </div>
-            
+
             <div class="dont-show-again">
                 <input type="checkbox" id="dontShowAgain">
                 <label for="dontShowAgain">Jangan tampilkan lagi</label>
             </div>
-            
+
             <button class="modal-button" id="continueButton">Lanjutkan ke Chat</button>
         </div>
     </div>
-    
+
     <!-- Toast Notification -->
     <div class="toast" id="toastNotification">Teks berhasil disalin!</div>
-    
+
     <div class="header">
         <div class="header-title">RyLac AI</div>
         <div class="header-buttons">
@@ -109,7 +109,7 @@
                 <i class="fas fa-plus"></i> Chat Baru
             </button>
             <button class="chat-action-button" id="modelButton">
-                <i class="fas fa-robot"></i> Ganti Model
+                <i class="fas fa-robot"></i> GPT-3
             </button>
         </div>
         <div class="input-container">
@@ -121,27 +121,12 @@
         </div>
     </div>
 
-    <div class="model-selector" id="modelSelector">
-        <div class="model-option" data-model="gpt3">
-            <i class="fas fa-brain"></i>
-            <span>GPT-3</span>
-        </div>
-        <div class="model-option" data-model="waifu-diff">
-            <i class="fas fa-image"></i>
-            <span>Waifu Diffusion</span>
-        </div>
-        <div class="model-option" data-model="flux-diffusion">
-            <i class="fas fa-paint-brush"></i>
-            <span>Flux Diffusion</span>
-        </div>
-    </div>
-
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-title">Menu</div>
             <button class="close-sidebar" id="closeSidebar">&times;</button>
         </div>
-        
+
         <div class="sidebar-section">
             <div class="sidebar-section-title">Tentang</div>
             <p style="color: var(--subtext-color); margin-bottom: 15px; line-height: 1.5;">
@@ -150,7 +135,7 @@
 Aku selalu siap dengerin, bantuin, dan ngasih respon yang bikin nyaman. Bareng RyLac, semuanya jadi terasa lebih seru dan ringan!
             </p>
         </div>
-        
+
         <div class="sidebar-section">
             <div class="sidebar-section-title">Chat</div>
             <button class="sidebar-link" id="historyButton" style="width: 100%; text-align: left; border: none; background: none; cursor: pointer;">
@@ -160,12 +145,12 @@ Aku selalu siap dengerin, bantuin, dan ngasih respon yang bikin nyaman. Bareng R
                 <i class="fas fa-plus"></i> Chat Baru
             </button>
         </div>
-        
+
         <div class="sidebar-section" id="toolsSection">
             <div class="sidebar-section-title">Tools</div>
             <!-- Tools will be dynamically inserted here -->
         </div>
-        
+
         <div class="sidebar-section">
             <div class="sidebar-section-title">Pengaturan</div>
             <div class="setting-item">
@@ -180,14 +165,14 @@ Aku selalu siap dengerin, bantuin, dan ngasih respon yang bikin nyaman. Bareng R
                 <input type="range" min="0" max="100" value="10" class="slider-seekbar" id="wallpaperOpacitySlider">
             </div>
         </div>
-        
+
         <div class="sidebar-section">
             <div class="sidebar-section-title">Model Saat Ini</div>
             <div id="currentModelDisplay" style="padding: 10px 0; color: var(--text-color);">
                 <i class="fas fa-brain"></i> GPT-3
             </div>
         </div>
-        
+
         <div class="sidebar-section">
             <div class="sidebar-section-title">Dukungan</div>
             <a href="#" class="sidebar-link">Laporkan Masalah</a>
