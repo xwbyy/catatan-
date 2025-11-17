@@ -3,196 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <title>RyLac AI Chat - TOOLS Multi Fungsi</title>
+
+    <!-- SEO -->
     <meta name="description" content="RyLac AI Chat adalah asisten cerdas multi-fungsi yang siap membantu berbagai kebutuhan Anda, dari chatting hingga tools praktis.">
     <meta name="keywords" content="RyLac, AI Chat, Tools, Multi Fungsi, Asisten Virtual, OpenAI, ChatGPT">
     <meta name="author" content="Zayn dan Reni">
-    
+
     <!-- Favicon -->
     <link rel="icon" href="https://files.catbox.moe/zj48ha.jpg" type="image/jpeg">
-    
-    <!-- Open Graph (untuk berbagi di media sosial) -->
+
+    <!-- Open Graph -->
     <meta property="og:title" content="RyLac AI Chat - TOOLS Multi Fungsi">
     <meta property="og:description" content="Asisten AI pintar dan ceria siap menemani dan membantu aktivitas Anda.">
     <meta property="og:image" content="https://files.catbox.moe/zj48ha.jpg">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://namasitusanda.com">
-    
+
+    <!-- GOOGLE ADSENSE SCRIPT TERBARU -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8511287367525783"
+    crossorigin="anonymous"></script>
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Menghubungkan file CSS eksternal -->
-    <link rel="stylesheet" href="page.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- iOS Style Header -->
-    <header>
-        <div class="container header-container">
-            <a href="#" class="logo floating">
-                <i class="fas fa-robot"></i>
-                <span>Rylac AI</span>
-            </a>
-            <button class="mobile-menu-btn" id="mobileMenuBtn">
+
+    <div class="wallpaper"></div>
+
+    <!-- Welcome Modal -->
+    <div class="modal-overlay" id="welcomeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Selamat Datang di RyLac AI v2.0.0</div>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+
+            <div class="modal-section">
+                <div class="modal-section-title">🎉 Pembaruan Terbaru!</div>
+                <p class="modal-text">
+                    <strong>Yang baru di v2.0.0:</strong><br>
+                    ✅ AI Chat lebih stabil<br>
+                    ✅ Performa lebih cepat<br>
+                </p>
+            </div>
+
+            <div class="modal-section">
+                <div class="modal-section-title">📢 Informasi Update</div>
+                <p class="modal-text">
+                    Gabung grup/channel untuk info fitur terbaru!
+                </p>
+                <a href="https://ig.me/j/AbZCbHKlwj7chFpl" target="_blank" class="modal-button">
+                    <i class="fab fa-instagram"></i> Gabung Grup Instagram
+                </a>
+                <a href="https://whatsapp.com/channel/0029Vb5OEoNGU3BIMghDnb1C" target="_blank" class="modal-button">
+                    <i class="fab fa-whatsapp"></i> Gabung Channel WhatsApp
+                </a>
+            </div>
+
+            <!-- AdSense Unit -->
+            <div class="ad-container" style="margin: 10px 0;">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-8511287367525783"
+                     data-ad-slot="1234567890"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+
+            <div class="dont-show-again">
+                <input type="checkbox" id="dontShowAgain">
+                <label for="dontShowAgain">Jangan tampilkan lagi</label>
+            </div>
+
+            <button class="modal-button primary" id="continueButton">
+                <i class="fas fa-comments"></i> Mulai Chat Sekarang
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toastNotification"></div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">RyLac AI v2.0.0</div>
+        <div class="header-buttons">
+            <button class="icon-button" id="menuButton">
                 <i class="fas fa-bars"></i>
             </button>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="#features">Fitur</a></li>
-                <li><a href="#testimonials">Testimoni</a></li>
-                <li><a href="dasboard.html" target="_blank">Mulai Sekarang</a></li>
-            </ul>
         </div>
-    </header>
+    </div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="floating delay-1">Rasakan Masa Depan dengan Rylac AI</h1>
-                <p class="floating delay-2">Asisten cerdas Anda untuk segala kebutuhan digital. Chat dengan AI canggih kami, download konten media sosial, dan akses berbagai alat powerful - semuanya dalam satu platform.</p>
-                <a href="/dasboard/index.html" class="cta-button">Mulai Sekarang</a>
+    <!-- Chat Container -->
+    <div class="chat-container" id="chatContainer">
+        <div class="empty-state">
+            <i class="fas fa-robot" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i><br>
+            Mulai percakapan baru dengan RyLac AI<br>
+            <small style="opacity: 0.7;">AI yang ceria dan penuh perhatian siap membantumu!</small>
+        </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-area">
+        <div class="chat-controls">
+            <button class="chat-action-button" id="newChatButton">
+                <i class="fas fa-plus"></i> Chat Baru
+            </button>
+            <button class="chat-action-button" id="modelButton">
+                <i class="fas fa-robot"></i> <span id="currentModelDisplay">GPT-3</span>
+            </button>
+        </div>
+
+        <div class="input-container">
+            <textarea class="message-input" id="messageInput" placeholder="Tulis pesan untuk RyLac AI..." rows="1"></textarea>
+            <button class="send-button" id="sendButton" disabled>
+                <i class="fas fa-paper-plane send-icon"></i>
+                <div class="spinner"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Menu RyLac</div>
+            <button class="close-sidebar" id="closeSidebar">&times;</button>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">🤖 Tentang RyLac</div>
+            <p style="color: var(--subtext-color); margin-bottom: 15px;">
+                RyLac adalah AI ceria, lembut, dan penuh perhatian. Dibuat oleh Zayn & Reni ❤️
+            </p>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">💬 Chat</div>
+            <button class="sidebar-link" id="historyButton">
+                <i class="fas fa-history"></i> Riwayat Chat
+            </button>
+            <button class="sidebar-link" id="newChatSidebarButton">
+                <i class="fas fa-plus"></i> Chat Baru
+            </button>
+        </div>
+
+        <div class="sidebar-section" id="toolsSection">
+            <div class="sidebar-section-title">🛠️ Tools</div>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">⚙️ Pengaturan</div>
+            <div class="setting-item">
+                <span class="setting-label">Wallpaper</span>
+                <label class="switch"><input type="checkbox" id="wallpaperToggle" checked><span class="slider"></span></label>
+            </div>
+            <div class="setting-item">
+                <span class="setting-label">Opacity Wallpaper</span>
+                <input type="range" min="0" max="100" value="10" class="slider-seekbar" id="wallpaperOpacitySlider">
             </div>
         </div>
-    </section>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="container">
-            <h2 class="section-title"></h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-comment-dots"></i>
-                    </div>
-                    <h3>Chat Cerdas</h3>
-                    <p>AI kami memahami konteks dan memberikan respons seperti manusia untuk pertanyaan dan permintaan Anda.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-download"></i>
-                    </div>
-                    <h3>Unduh Media</h3>
-                    <p>Unduh video, gambar, dan audio dari semua platform utama hanya dengan satu klik.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <h3>Pengalaman Mulus</h3>
-                    <p>Antarmuka yang dirancang indah bekerja sempurna di semua perangkat Anda.</p>
-                </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">🧠 Model AI</div>
+            <div style="padding: 10px 0; color: var(--text-color);">
+                <i class="fas fa-brain"></i> GPT-3 (Enhanced)
             </div>
         </div>
-    </section>
 
-    <!-- Testimonial Section -->
-    <section class="testimonials" id="testimonials">
-        <div class="container">
-            <h2 class="section-title">Apa Kata Pengguna Kami?</h2>
-            <div class="testimonial-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        "Rylac AI benar-benar mengubah cara saya bekerja. Fitur downloadnya sangat membantu untuk riset konten!"
-                    </div>
-                    <div class="testimonial-author">
-                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="User" class="author-avatar">
-                        <div class="author-info">
-                            <h4>Sarah Wijaya</h4>
-                            <p>Content Creator</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        "AI chat-nya sangat responsif dan membantu menyelesaikan masalah teknis yang saya alami."
-                    </div>
-                    <div class="testimonial-author">
-                        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="User" class="author-avatar">
-                        <div class="author-info">
-                            <h4>Budi Santoso</h4>
-                            <p>Pengembang Web</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        "Saya suka antarmukanya yang bersih dan mudah digunakan. Tidak perlu waktu lama untuk memahami cara kerjanya."
-                    </div>
-                    <div class="testimonial-author">
-                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User" class="author-avatar">
-                        <div class="author-info">
-                            <h4>Dewi Lestari</h4>
-                            <p>Mahasiswa</p>
-                        </div>
-                    </div>
-                </div>
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">❤️ Dukungan</div>
+            <a href="#" class="sidebar-link"><i class="fas fa-bug"></i> Laporkan Masalah</a>
+            <a href="#" class="sidebar-link"><i class="fas fa-lightbulb"></i> Saran Fitur</a>
+            <a href="https://ko-fi.com/example" target="_blank" class="donate-button"><i class="fas fa-heart"></i> Donasi</a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">ℹ️ Server Info</div>
+            <div style="padding: 10px 0; color: var(--subtext-color); font-size: 12px;">
+                Status: <span style="color: var(--secondary-color);">●</span> Online<br>
+                Version: 2.0.0<br>
+                Session: <span id="sessionDisplay">${sessionId}</span>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Search Section -->
-    <section class="search-section" id="search">
-        <div class="container">
-            <h2 class="section-title"></h2>
-            <p style="text-align: center; margin-bottom: 30px; color: var(--light-text); padding: 0 20px;"></p>
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Cari fitur, alat, atau bantuan...">
-                <button class="search-btn">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-        </div>
-    </section>
+    <!-- Audio -->
+    <audio id="sendSound" src="https://files.catbox.moe/4zlyeg.mp3"></audio>
+    <audio id="receiveSound" src="https://files.catbox.moe/xaw68y.mp3"></audio>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-container">
-                <div class="footer-column">
-                    <h3>Rylac AI</h3>
-                    <p style="color: var(--light-text); margin-bottom: 20px; font-size: 15px; padding: 0 5px;">Asisten cerdas Anda untuk dunia digital.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h3>Tautan Cepat</h3>
-                    <ul class="footer-links">
-                        <li><a href="#features">Fitur</a></li>
-                        <li><a href="#testimonials">Testimoni</a></li>
-                        <li><a href="https://rylac.my.id" target="_blank">Mulai Sekarang</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Dukungan</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Pusat Bantuan</a></li>
-                        <li><a href="#">Hubungi Kami</a></li>
-                        <li><a href="#">Kebijakan Privasi</a></li>
-                        <li><a href="#">Syarat & Ketentuan</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Newsletter</h3>
-                    <p style="color: var(--light-text); font-size: 15px; margin-bottom: 15px; padding: 0 5px;">Berlangganan untuk update dan berita terbaru.</p>
-                    <div style="display: flex; padding: 0 5px;">
-                        <input type="email" placeholder="Email Anda" style="flex: 1; padding: 12px; border: none; border-radius: 8px 0 0 8px; background: rgba(255, 255, 255, 0.8); font-size: 14px;">
-                        <button style="background: var(--primary-color); color: white; border: none; padding: 0 18px; border-radius: 0 8px 8px 0; cursor: pointer;">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="copyright">
-                &copy; 2023 Rylac AI. Semua hak dilindungi.
-            </div>
-        </div>
-    </footer>
-
-    <!-- Menghubungkan file JavaScript -->
+    <!-- JS -->
     <script src="config.js"></script>
+    <script src="app.js"></script>
+
 </body>
 </html>
