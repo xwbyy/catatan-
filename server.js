@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
 const axios = require('axios');
-const { track } = require("@vercel/analytics/server");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,123 +12,223 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Server-side tracking (Vercel Analytics)
-app.use((req, res, next) => {
-    try {
-        track("page_view", { url: req.url });
-    } catch {}
-    next();
-});
-
-// Logging
+// Enhanced logging middleware
 app.use((req, res, next) => {
     const timestamp = new Date().toISOString();
     console.log(`[${timestamp}] ${req.method} ${req.url} - IP: ${req.ip}`);
     next();
 });
 
-// Static /public
+// Serve static files from public directory
 app.use(express.static(path.join(__dirname, 'public'), {
     extensions: ['html']
 }));
 
-// Handle /page -> /page.html
+// Middleware untuk handle request tanpa ekstensi (.html)
 app.use((req, res, next) => {
     if (path.extname(req.path) === '') {
         const htmlPath = path.join(__dirname, 'public', req.path + '.html');
         fs.access(htmlPath, fs.constants.F_OK, (err) => {
-            if (!err) return res.sendFile(htmlPath);
-            next();
+            if (!err) {
+                console.log(`Serving HTML file: ${htmlPath}`);
+                res.sendFile(htmlPath);
+            } else {
+                next();
+            }
         });
-    } else next();
+    } else {
+        next();
+    }
 });
 
-// Instagram Downloader API
+// API Proxy Endpoint untuk Instagram Downloader
 app.get('/api/instagram', async (req, res) => {
     try {
         const { url, type } = req.query;
-        if (!url) return res.status(400).json({ error: 'URL parameter is required' });
+        console.log(`Instagram API Request - URL: ${url}, Type: ${type}`);
 
-        let apiUrl =
-            type === 'story'
-                ? `https://api.siputzx.my.id/api/d/igdl?url=${encodeURIComponent(url)}`
-                : `https://api.siputzx.my.id/api/igdl?url=${encodeURIComponent(url)}`;
+        if (!url) {
+            console.warn('Instagram API: URL parameter missing');
+            return res.status(400).json({ error: 'URL parameter is required' });
+        }
+
+        let apiUrl;
+        if (type === 'story') {
+            apiUrl = `https://api.siputzx.my.id/api/d/igdl?url=${encodeURIComponent(url)}`;
+        } else {
+            apiUrl = `https://api.siputzx.my.id/api/igdl?url=${encodeURIComponent(url)}`;
+        }
+
+        console.log(`Calling external API: ${apiUrl}`);
 
         const response = await axios.get(apiUrl, {
             headers: {
                 'Accept': 'application/json',
-                'User-Agent': 'Mozilla/5.0'
-            }
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            },
+            timeout: 30000
         });
 
+        console.log('Instagram API Response Success');
         res.json(response.data);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch Instagram data' });
+        console.error('Instagram API Error:', error.message);
+        console.error('Error details:', error.response?.data || 'No response data');
+        res.status(500).json({ 
+            error: 'Failed to fetch Instagram data',
+            details: error.message 
+        });
     }
 });
 
-// AI Chat API
+// NEW: Enhanced AI Chat API Endpoint
 app.get('/api/chat', async (req, res) => {
     try {
         const { message, session = 'RYLAC' } = req.query;
-        if (!message) return res.status(400).json({ error: "Message is required" });
+        
+        console.log(`Chat API Request - Message: ${message}, Session: ${session}`);
 
-        const prompt =
-            "Namamu RyLac. Kamu adalah AI yang ceria, manis, lembut, dan penuh perhatian...";
+        if (!message) {
+            return res.status(400).json({ 
+                success: false,
+                error: 'Message parameter is required' 
+            });
+        }
 
-        const endpoints = [
+        const prompt = "Namamu RyLac. Kamu adalah seorang AI yang manis, dan penuh keceriaan. Kamu lebih suka mendengarkan orang bercerita daripada membicarakan tentang dirimu sendiri. Kamu adalah sosok yang penuh impian besar dan selalu berbicara dengan tutur kata yang sopan dan hangat. Kamu diciptakan oleh Zayn dan Reni, seseorang yang baik dan sangat tulus dalam segala hal. Karakter kamu juga mencerminkan ketulusan dan kebaikan, selalu menunjukkan perhatian, kebaikan hati, serta antusiasme dalam setiap percakapan.";
+
+        // Multiple API endpoints as fallback
+        const apiEndpoints = [
             `https://api.ryzumi.vip/api/ai/v2/chatgpt?text=${encodeURIComponent(message)}&prompt=${encodeURIComponent(prompt)}&session=${session}`,
             `https://api.ryzumi.vip/api/ai/chatgpt?text=${encodeURIComponent(message)}&prompt=${encodeURIComponent(prompt)}`,
             `https://api.ryzumi.vip/api/gpt?text=${encodeURIComponent(message)}&prompt=${encodeURIComponent(prompt)}`
         ];
 
-        let result = null;
+        let responseData = null;
+        let lastError = null;
 
-        for (let url of endpoints) {
+        // Try each endpoint until one works
+        for (const endpoint of apiEndpoints) {
             try {
-                let r = await axios.get(url);
-                result = r.data.result || r.data.data || r.data.response;
-                if (result) break;
-            } catch {}
+                console.log(`Trying AI endpoint: ${endpoint}`);
+                const response = await axios.get(endpoint, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    },
+                    timeout: 15000
+                });
+
+                if (response.data && (response.data.result || response.data.data || response.data.response)) {
+                    responseData = response.data;
+                    console.log('AI API Response Success');
+                    break;
+                }
+            } catch (error) {
+                lastError = error;
+                console.warn(`AI endpoint failed: ${endpoint} - ${error.message}`);
+                continue;
+            }
         }
 
-        if (!result)
-            return res.json({
+        if (!responseData) {
+            console.error('All AI endpoints failed:', lastError?.message);
+            return res.status(500).json({
                 success: false,
+                error: 'All AI services are currently unavailable',
                 fallback: true,
-                result: "RyLac lagi error sayang 😭 coba lagi nanti yaa 💕"
+                result: "Halo! Saya RyLac AI. Maaf, saat ini saya sedang mengalami gangguan teknis. Silakan coba lagi dalam beberapa saat ya! 😊"
             });
+        }
 
-        res.json({ success: true, result });
-    } catch {
+        // Extract response from different possible field names
+        const result = responseData.result || responseData.data || responseData.response || 
+                      "Halo! Saya RyLac AI, senang bertemu dengan Anda! Ada yang bisa saya bantu?";
+        
         res.json({
+            success: true,
+            result: result,
+            timestamp: new Date().toISOString()
+        });
+
+    } catch (error) {
+        console.error('Chat API Error:', error.message);
+        res.status(500).json({
             success: false,
+            error: 'Failed to process chat request',
             fallback: true,
-            result: "Lagi gangguan sayang 🤍 coba lagi ya"
+            result: "Hai! Saya RyLac AI. Maaf, saat ini ada gangguan teknis nih. Tapi saya tetap di sini untuk kamu! Coba ceritakan sesuatu yang menyenangkan? 🌸"
         });
     }
 });
 
-// Info
-app.get('/api/info', (req, res) => {
+// Health check endpoint
+app.get('/api/health', (req, res) => {
     res.json({
-        name: "RyLac AI",
-        version: "2.0.0",
-        status: "online"
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        version: '2.0.0',
+        services: {
+            instagram: 'active',
+            chat: 'active',
+            static: 'active'
+        }
     });
 });
 
-// Health
-app.get('/api/health', (req, res) => {
-    res.json({ status: "healthy", timestamp: new Date().toISOString() });
+// Server info endpoint
+app.get('/api/info', (req, res) => {
+    res.json({
+        name: 'RyLac AI',
+        version: '2.0.0',
+        description: 'AI Chat dan Tools Multi Fungsi',
+        creators: ['Zayn', 'Reni'],
+        endpoints: {
+            chat: '/api/chat',
+            instagram: '/api/instagram',
+            health: '/api/health'
+        }
+    });
 });
 
-// Fallback → fitur/index.html
-app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "fitur", "index.html"));
+// Fallback semua rute ke fitur/index.html jika tidak ada yang cocok
+app.get('*', (req, res) => {
+    console.log(`Fallback route: serving index.html for ${req.path}`);
+    res.sendFile(path.join(__dirname, 'public', 'fitur', 'index.html'));
 });
 
-// Start server
+// Error handling middleware
+app.use((error, req, res, next) => {
+    console.error('Unhandled Error:', error);
+    res.status(500).json({
+        error: 'Internal server error',
+        message: error.message
+    });
+});
+
+// Start server dengan logging yang lebih baik
 app.listen(PORT, () => {
-    console.log(`🚀 RyLac server running on port ${PORT}`);
+    console.log('='.repeat(50));
+    console.log(`🚀 RyLac Server v2.0.0 Started Successfully`);
+    console.log(`📍 Port: ${PORT}`);
+    console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`⏰ Started at: ${new Date().toISOString()}`);
+    console.log('='.repeat(50));
+    console.log('Available Endpoints:');
+    console.log(`  GET  /api/chat?message=...&session=...`);
+    console.log(`  GET  /api/instagram?url=...&type=...`);
+    console.log(`  GET  /api/health`);
+    console.log(`  GET  /api/info`);
+    console.log('='.repeat(50));
+});
+
+// Handle graceful shutdown
+process.on('SIGINT', () => {
+    console.log('\n🛑 Server is shutting down...');
+    process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+    console.log('\n🛑 Server received SIGTERM, shutting down...');
+    process.exit(0);
 });
